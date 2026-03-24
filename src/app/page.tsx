@@ -194,9 +194,9 @@ export default function Home() {
 
   /* Stats counters */
   const stat1 = useCountUp(27);
-  const stat2 = useCountUp(128400);
+  const stat2 = useCountUp(1284);
   const stat3 = useCountUp(99);
-  const stat4 = useCountUp(4200);
+  const stat4 = useCountUp(120);
 
   /* Scroll handler for header */
   const handleScroll = useCallback(() => {
@@ -1065,7 +1065,7 @@ export default function Home() {
             <span className="cta-title-accent">27秒</span>で終わらせましょう。
           </h2>
           <p className="cta-desc fade-in">
-            4,200社が使い始めています。無料プランならリスクゼロで試せます。
+            120社が使い始めています。無料プランならリスクゼロで試せます。
           </p>
 
           <div className="cta-actions fade-in">
