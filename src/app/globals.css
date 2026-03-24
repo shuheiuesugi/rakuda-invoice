@@ -705,14 +705,14 @@ strong { font-weight: 650; color: var(--c-ink); }
 }
 
 .mockup-float-card--time {
-  top: 24px;
-  left: -20px;
+  top: -16px;
+  left: -36px;
   animation: float-a 7s ease-in-out infinite;
 }
 
 .mockup-float-card--check {
-  bottom: 48px;
-  right: -16px;
+  bottom: -8px;
+  right: -32px;
   animation: float-b 8s ease-in-out infinite 1s;
 }
 
