@@ -39,6 +39,54 @@
       "regex": "^/_not\\-found(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/book-call",
+      "regex": "^/book\\-call(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/book\\-call(?:/)?$"
+    },
+    {
+      "page": "/lp/cost",
+      "regex": "^/lp/cost(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/lp/cost(?:/)?$"
+    },
+    {
+      "page": "/lp/easy",
+      "regex": "^/lp/easy(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/lp/easy(?:/)?$"
+    },
+    {
+      "page": "/privacy",
+      "regex": "^/privacy(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/privacy(?:/)?$"
+    },
+    {
+      "page": "/security",
+      "regex": "^/security(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/security(?:/)?$"
+    },
+    {
+      "page": "/signup",
+      "regex": "^/signup(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/signup(?:/)?$"
+    },
+    {
+      "page": "/terms",
+      "regex": "^/terms(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/terms(?:/)?$"
+    },
+    {
+      "page": "/tokushoho",
+      "regex": "^/tokushoho(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tokushoho(?:/)?$"
     }
   ],
   "dataRoutes": [],

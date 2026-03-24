@@ -863,7 +863,7 @@ export default function Home() {
                 </li>
               </ul>
 
-              <a href="./signup" className="pricing-btn pricing-btn--free" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>無料で始める</a>
+              <a href="./signup?plan=free" className="pricing-btn pricing-btn--free" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>無料で始める</a>
             </div>
 
             {/* Pro Plan */}
@@ -935,7 +935,66 @@ export default function Home() {
                 </li>
               </ul>
 
-              <a href="./signup" className="pricing-btn pricing-btn--pro" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Proプランを始める</a>
+              <a href="./signup?plan=pro" className="pricing-btn pricing-btn--pro" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Proプランを始める</a>
+            </div>
+
+            {/* Enterprise Plan */}
+            <div className="pricing-card pricing-card--enterprise fade-in stagger-3">
+              <div className="pricing-plan-name">Enterprise</div>
+              <div className="pricing-price">
+                <span className="pricing-amount" style={{ fontSize: "1.5rem" }}>お問い合わせ</span>
+              </div>
+              <div className="pricing-period">カスタム料金・SLA対応</div>
+              <p className="pricing-desc">
+                経理チーム・法人全体での導入に。IT統制・監査要件にも対応します。
+              </p>
+
+              <ul className="pricing-features">
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--pro" aria-hidden="true">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2L8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  Proの全機能
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--pro" aria-hidden="true">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2L8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  チームメンバー無制限
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--pro" aria-hidden="true">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2L8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  SSO / SAML 2.0 連携
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--pro" aria-hidden="true">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2L8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  REST API / Webhook
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--pro" aria-hidden="true">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2L8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  専任カスタマーサクセス
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--pro" aria-hidden="true">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2L8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  SLA 99.9% 稼働率保証
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--pro" aria-hidden="true">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2L8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                  監査ログ / コンプライアンス
+                </li>
+              </ul>
+
+              <a href="./book-call" className="pricing-btn pricing-btn--free" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>お問い合わせ</a>
             </div>
           </div>
 
