@@ -278,12 +278,10 @@ export default function CostLP() {
       >
         <div className="header-inner">
           <a href="../" className="header-logo">
-            <span className="header-logo-icon" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M9 2L4 16h3l1.5-4h3L13 16h3L9 2zm0 4.5L10.5 11h-3L9 6.5z" fill="currentColor"/>
-              </svg>
-            </span>
-            <span>ラクダ<span className="logo-accent">Invoice</span></span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 40" style={{ height: "20px", width: "auto" }}>
+              <path d="M4,32 C4,32 12,6 24,6 C34,6 28,28 36,28 C44,28 38,4 48,4 C60,4 68,32 68,32" stroke="currentColor" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+              <text x="80" y="28" fontFamily="'Helvetica Neue',Arial,sans-serif" fontSize="22" fontWeight="300" fill="currentColor" letterSpacing="3">RAKUDAインボイス</text>
+            </svg>
           </a>
 
           <nav className="header-nav" role="navigation" aria-label="メインナビゲーション">
@@ -1025,64 +1023,33 @@ export default function CostLP() {
       </section>
 
       {/* ═══════════ FOOTER ═══════════ */}
-      <footer className="site-footer">
-        <div className="footer-inner">
-          <div className="footer-top">
-            <div className="footer-brand">
-              <div className="footer-logo">
-                <span className="footer-logo-icon" aria-hidden="true">
-                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                    <path d="M9 2L4 16h3l1.5-4h3L13 16h3L9 2zm0 4.5L10.5 11h-3L9 6.5z" fill="currentColor"/>
-                  </svg>
-                </span>
-                <span>ラクダ<span className="logo-accent">Invoice</span></span>
-              </div>
-              <p className="footer-brand-desc">
-                AIで請求書業務をシンプルに。
-                <br />
-                フリーランスから法人まで、すべてのビジネスに。
-              </p>
-            </div>
-
+      <footer style={{ borderTop: "1px solid #E5E5E5", background: "#fff", padding: "40px 24px" }}>
+        <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "32px" }}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20">
+              <path d="M10,75 C10,75 22,25 38,25 C52,25 44,65 56,65 C68,65 60,20 74,20 C90,20 100,75 100,75" stroke="#1A1A2E" strokeWidth="7" fill="none" strokeLinecap="round"/>
+            </svg>
+            <span style={{ fontSize: "14px", fontWeight: 300, letterSpacing: "0.15em", color: "#111" }}>RAKUDA AI</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px", marginBottom: "32px" }}>
             <div>
-              <h4 className="footer-col-title">プロダクト</h4>
-              <ul className="footer-links">
-                <li><a href="#features" className="footer-link">機能一覧</a></li>
-                <li><a href="#pricing" className="footer-link">料金プラン</a></li>
-                <li><a href="#" className="footer-link">APIドキュメント</a></li>
-                <li><a href="#" className="footer-link">アップデート情報</a></li>
+              <h3 style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "#9CA3AF", marginBottom: "12px" }}>サポート</h3>
+              <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column" as const, gap: "8px" }}>
+                <li><a href="mailto:info@rakuda-ai.com" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>info@rakuda-ai.com</a></li>
               </ul>
             </div>
-
             <div>
-              <h4 className="footer-col-title">サポート</h4>
-              <ul className="footer-links">
-                <li><a href="#faq" className="footer-link">よくある質問</a></li>
-                <li><a href="../book-call" className="footer-link">導入相談を予約</a></li>
-                <li><a href="#" className="footer-link">ヘルプセンター</a></li>
-                <li><a href="#" className="footer-link">サービスステータス</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="footer-col-title">会社情報</h4>
-              <ul className="footer-links">
-                <li><a href="#" className="footer-link">運営会社</a></li>
-                <li><a href="../security" className="footer-link">セキュリティ</a></li>
-                <li><a href="#" className="footer-link">採用情報</a></li>
-                <li><a href="#" className="footer-link">ブログ</a></li>
+              <h3 style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "#9CA3AF", marginBottom: "12px" }}>リンク</h3>
+              <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column" as const, gap: "8px" }}>
+                <li><a href="../terms" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>利用規約</a></li>
+                <li><a href="../privacy" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>プライバシーポリシー</a></li>
+                <li><a href="../tokushoho" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>特定商取引法</a></li>
+                <li><a href="../security" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>セキュリティ</a></li>
               </ul>
             </div>
           </div>
-
-          <div className="footer-bottom">
-            <p className="footer-copy">&copy; 2026 ラクダInvoice. All rights reserved.</p>
-            <div className="footer-legal">
-              <a href="../terms" className="footer-legal-link">利用規約</a>
-              <a href="../privacy" className="footer-legal-link">プライバシーポリシー</a>
-              <a href="../tokushoho" className="footer-legal-link">特定商取引法に基づく表記</a>
-              <a href="../security" className="footer-legal-link">セキュリティ</a>
-            </div>
+          <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
+            &copy; 2026 Rakuda AI Inc. All rights reserved.
           </div>
         </div>
       </footer>

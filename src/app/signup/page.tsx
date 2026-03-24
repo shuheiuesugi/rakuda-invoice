@@ -51,43 +51,10 @@ export default function SignupPage() {
         .signup-header-logo {
           display: inline-flex;
           align-items: center;
-          gap: 10px;
           text-decoration: none;
-          color: inherit;
         }
         .signup-header-logo:hover {
           opacity: 0.85;
-        }
-        .signup-logo-icon {
-          width: 32px;
-          height: 32px;
-          background: #1D4ED8;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-        .signup-logo-text {
-          display: flex;
-          flex-direction: column;
-          gap: 0;
-        }
-        .signup-logo-name {
-          font-size: 15px;
-          font-weight: 700;
-          color: #111827;
-          line-height: 1.2;
-          letter-spacing: -0.01em;
-        }
-        .signup-logo-name span {
-          color: #1D4ED8;
-        }
-        .signup-logo-tagline {
-          font-size: 10px;
-          color: #9CA3AF;
-          line-height: 1.2;
-          letter-spacing: 0.02em;
         }
 
         /* ── Main ── */
@@ -357,15 +324,10 @@ export default function SignupPage() {
         <header className="signup-header">
           <div className="signup-header-inner">
             <a href="./" className="signup-header-logo">
-              <div className="signup-logo-icon">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 2L5.5 14H7.5L8.3 11.5H9.7L10.5 14H12.5L9 2ZM8.7 9.8L9 8.5L9.3 9.8H8.7Z" fill="white"/>
-                </svg>
-              </div>
-              <div className="signup-logo-text">
-                <span className="signup-logo-name">ラクダ<span>Invoice</span></span>
-                <span className="signup-logo-tagline">AI請求書作成ツール</span>
-              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 40" style={{ height: "20px", width: "auto" }}>
+                <path d="M4,32 C4,32 12,6 24,6 C34,6 28,28 36,28 C44,28 38,4 48,4 C60,4 68,32 68,32" stroke="#1a1a2e" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+                <text x="80" y="28" fontFamily="'Helvetica Neue',Arial,sans-serif" fontSize="22" fontWeight="300" fill="#1a1a2e" letterSpacing="3">RAKUDAインボイス</text>
+              </svg>
             </a>
           </div>
         </header>
@@ -469,6 +431,38 @@ export default function SignupPage() {
             </div>
           )}
         </main>
+
+        {/* ── Footer ── */}
+        <footer style={{ borderTop: "1px solid #E5E5E5", background: "#fff", padding: "40px 24px" }}>
+          <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "32px" }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20">
+                <path d="M10,75 C10,75 22,25 38,25 C52,25 44,65 56,65 C68,65 60,20 74,20 C90,20 100,75 100,75" stroke="#1A1A2E" strokeWidth="7" fill="none" strokeLinecap="round"/>
+              </svg>
+              <span style={{ fontSize: "14px", fontWeight: 300, letterSpacing: "0.15em", color: "#111" }}>RAKUDA AI</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px", marginBottom: "32px" }}>
+              <div>
+                <h3 style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "#9CA3AF", marginBottom: "12px" }}>サポート</h3>
+                <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column" as const, gap: "8px" }}>
+                  <li><a href="mailto:info@rakuda-ai.com" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>info@rakuda-ai.com</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "#9CA3AF", marginBottom: "12px" }}>リンク</h3>
+                <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column" as const, gap: "8px" }}>
+                  <li><a href="./terms" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>利用規約</a></li>
+                  <li><a href="./privacy" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>プライバシーポリシー</a></li>
+                  <li><a href="./tokushoho" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>特定商取引法</a></li>
+                  <li><a href="./security" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>セキュリティ</a></li>
+                </ul>
+              </div>
+            </div>
+            <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
+              &copy; 2026 Rakuda AI Inc. All rights reserved.
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   );
