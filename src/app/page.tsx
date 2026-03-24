@@ -237,7 +237,7 @@ export default function Home() {
             <a href="#features" className="header-nav-link">機能</a>
             <a href="#pricing" className="header-nav-link">料金</a>
             <a href="#faq" className="header-nav-link">FAQ</a>
-            <a href="#cta" className="header-cta">
+            <a href="./signup" className="header-cta">
               無料で始める
             </a>
           </nav>
@@ -265,7 +265,7 @@ export default function Home() {
             <a href="#features" className="mobile-menu-link" onClick={() => setMobileMenuOpen(false)}>機能</a>
             <a href="#pricing" className="mobile-menu-link" onClick={() => setMobileMenuOpen(false)}>料金</a>
             <a href="#faq" className="mobile-menu-link" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
-            <a href="#cta" className="mobile-menu-cta" onClick={() => setMobileMenuOpen(false)}>無料で始める</a>
+            <a href="./signup" className="mobile-menu-cta" onClick={() => setMobileMenuOpen(false)}>無料で始める</a>
           </div>
         )}
       </header>
@@ -300,7 +300,7 @@ export default function Home() {
             </p>
 
             <div className="hero-actions fade-in">
-              <a href="#cta" className="btn-primary btn-primary--large">
+              <a href="./signup" className="btn-primary btn-primary--large">
                 無料アカウントを作成
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path d="M4 9h10m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -865,7 +865,7 @@ export default function Home() {
                 </li>
               </ul>
 
-              <button className="pricing-btn pricing-btn--free">無料で始める</button>
+              <a href="./signup" className="pricing-btn pricing-btn--free" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>無料で始める</a>
             </div>
 
             {/* Pro Plan */}
@@ -937,7 +937,7 @@ export default function Home() {
                 </li>
               </ul>
 
-              <button className="pricing-btn pricing-btn--pro">Proプランを始める</button>
+              <a href="./signup" className="pricing-btn pricing-btn--pro" style={{ display: "block", textAlign: "center", textDecoration: "none" }}>Proプランを始める</a>
             </div>
           </div>
 
@@ -1012,11 +1012,14 @@ export default function Home() {
           </p>
 
           <div className="cta-actions fade-in">
-            <a href="#" className="btn-primary btn-primary--large btn-primary--glow">
+            <a href="./signup" className="btn-primary btn-primary--large btn-primary--glow">
               無料で始める
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                 <path d="M4 9h10m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
+            </a>
+            <a href="./book-call" className="btn-ghost">
+              導入相談を予約
             </a>
           </div>
 
@@ -1064,8 +1067,8 @@ export default function Home() {
               <h4 className="footer-col-title">サポート</h4>
               <ul className="footer-links">
                 <li><a href="#faq" className="footer-link">よくある質問</a></li>
+                <li><a href="./book-call" className="footer-link">導入相談を予約</a></li>
                 <li><a href="#" className="footer-link">ヘルプセンター</a></li>
-                <li><a href="#" className="footer-link">お問い合わせ</a></li>
                 <li><a href="#" className="footer-link">サービスステータス</a></li>
               </ul>
             </div>
@@ -1074,8 +1077,8 @@ export default function Home() {
               <h4 className="footer-col-title">会社情報</h4>
               <ul className="footer-links">
                 <li><a href="#" className="footer-link">運営会社</a></li>
+                <li><a href="./security" className="footer-link">セキュリティ</a></li>
                 <li><a href="#" className="footer-link">採用情報</a></li>
-                <li><a href="#" className="footer-link">セキュリティ</a></li>
                 <li><a href="#" className="footer-link">ブログ</a></li>
               </ul>
             </div>
@@ -1084,9 +1087,10 @@ export default function Home() {
           <div className="footer-bottom">
             <p className="footer-copy">&copy; 2026 ラクダInvoice. All rights reserved.</p>
             <div className="footer-legal">
-              <a href="#" className="footer-legal-link">利用規約</a>
-              <a href="#" className="footer-legal-link">プライバシーポリシー</a>
-              <a href="#" className="footer-legal-link">特定商取引法に基づく表記</a>
+              <a href="./terms" className="footer-legal-link">利用規約</a>
+              <a href="./privacy" className="footer-legal-link">プライバシーポリシー</a>
+              <a href="./tokushoho" className="footer-legal-link">特定商取引法に基づく表記</a>
+              <a href="./security" className="footer-legal-link">セキュリティ</a>
             </div>
           </div>
         </div>
