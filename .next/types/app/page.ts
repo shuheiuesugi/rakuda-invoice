@@ -1,4 +1,4 @@
-// File: /private/tmp/rakuda-redesign/rakuda-invoice/src/app/page.tsx
+// File: /Users/macmini-1/Library/CloudStorage/GoogleDrive-shuhei@aviondor.com/共有ドライブ/株式会社Aviondor Group/社内用/01_株式会社Aviondor Group/00_全社/24_Claude/shuhei/rakuda-redesign/rakuda-invoice/src/app/page.tsx
 import * as entry from '../../../src/app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

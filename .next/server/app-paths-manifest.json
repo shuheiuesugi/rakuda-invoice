@@ -1,12 +1,12 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
   "/book-call/page": "app/book-call/page.js",
+  "/page": "app/page.js",
   "/signup/page": "app/signup/page.js",
+  "/security/page": "app/security/page.js",
   "/privacy/page": "app/privacy/page.js",
   "/tokushoho/page": "app/tokushoho/page.js",
-  "/security/page": "app/security/page.js",
   "/terms/page": "app/terms/page.js",
-  "/lp/easy/page": "app/lp/easy/page.js",
-  "/lp/cost/page": "app/lp/cost/page.js"
+  "/lp/cost/page": "app/lp/cost/page.js",
+  "/lp/easy/page": "app/lp/easy/page.js"
 }
