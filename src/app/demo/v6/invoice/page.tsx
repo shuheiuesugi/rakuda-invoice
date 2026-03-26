@@ -45,7 +45,7 @@ export default function InvoiceDetailPage() {
   return (
     <>
       {/* Back link */}
-      <Link href={`${basePath}/demo/v6`} style={{
+      <Link href="/demo/v6" style={{
         display: "inline-flex", alignItems: "center", gap: 6,
         color: "#7a8494", fontSize: 13, textDecoration: "none", marginBottom: 20,
       }}>

@@ -4,24 +4,25 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 
-const basePath = "/rakuda-invoice";
-
 const navItems = [
-  { label: "ダッシュボード", icon: "grid", href: `${basePath}/demo/v6` },
-  { label: "請求書一覧", icon: "file", href: `${basePath}/demo/v6` },
-  { label: "新規作成", icon: "plus", href: `${basePath}/demo/v6/create` },
-  { label: "取引先", icon: "users", href: `${basePath}/demo/v6/clients` },
-  { label: "テンプレート", icon: "copy", href: `${basePath}/demo/v6/templates` },
-  { label: "レポート", icon: "chart", href: `${basePath}/demo/v6/reports` },
-  { label: "設定", icon: "settings", href: `${basePath}/demo/v6/settings` },
+  { label: "ダッシュボード", icon: "grid", href: "/demo/v6" },
+  { label: "請求書一覧", icon: "file", href: "/demo/v6" },
+  { label: "新規作成", icon: "plus", href: "/demo/v6/create" },
+  { label: "取引先", icon: "users", href: "/demo/v6/clients" },
+  { label: "テンプレート", icon: "copy", href: "/demo/v6/templates" },
+  { label: "レポート", icon: "chart", href: "/demo/v6/reports" },
+  { label: "設定", icon: "settings", href: "/demo/v6/settings" },
 ];
 
 /* ── Components ──────────────────────────────── */
 
-function WaveLogo({ size = 28 }: { size?: number }) {
+function BrandLogo() {
   return (
-    <svg viewBox="0 0 100 100" style={{ width: size, height: size }}>
-      <path d="M10,75 C10,75 22,25 38,25 C52,25 44,65 56,65 C68,65 60,20 74,20 C90,20 100,75 100,75" stroke="currentColor" strokeWidth="7" fill="none" strokeLinecap="round"/>
+    <svg viewBox="0 0 380 40" style={{ height: 20, width: "auto", color: "#fff" }}>
+      <path d="M4,32 C4,32 12,6 24,6 C34,6 28,28 36,28 C44,28 38,4 48,4 C60,4 68,32 68,32"
+            stroke="currentColor" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+      <text x="80" y="28" fontFamily="'Helvetica Neue',Arial,sans-serif"
+            fontSize="22" fontWeight="300" fill="currentColor" letterSpacing="3">RAKUDAインボイス</text>
     </svg>
   );
 }
@@ -51,13 +52,13 @@ function getPageTitle(pathname: string): string {
 }
 
 function isActiveNav(pathname: string, href: string, index: number): boolean {
-  // Remove basePath for comparison
-  const clean = pathname.replace(basePath, "");
-  const cleanHref = href.replace(basePath, "");
+  // usePathname() returns path WITH basePath in static export
+  const clean = pathname.replace("/rakuda-invoice", "").replace(/\/$/, "");
+  const cleanHref = href.replace(/\/$/, "");
 
   // Dashboard and invoice list both point to /demo/v6
   if (index === 0 && clean === "/demo/v6") return true;
-  if (index === 1) return false; // 請求書一覧 shares href with dashboard; dashboard takes priority
+  if (index === 1) return false;
   if (index > 1 && clean.startsWith(cleanHref)) return true;
   return false;
 }
@@ -85,16 +86,12 @@ export default function V6Layout({ children }: { children: React.ReactNode }) {
         padding: "24px 0",
         flexShrink: 0,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "0 20px", marginBottom: 36 }}>
-          <span style={{ color: "#60a5fa" }}><WaveLogo size={26} /></span>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "#7a8494" }}>RAKUDA</div>
-            <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.02em", color: "#d1d5db", marginTop: -1 }}>INVOICE</div>
-          </div>
+        <div style={{ padding: "0 16px", marginBottom: 36 }}>
+          <BrandLogo />
         </div>
 
         <div style={{ padding: "0 12px", marginBottom: 8 }}>
-          <Link href={`${basePath}/demo/v6/create`} style={{ textDecoration: "none" }}>
+          <Link href="/demo/v6/create" style={{ textDecoration: "none" }}>
             <button style={{
               width: "100%",
               padding: "10px 14px",

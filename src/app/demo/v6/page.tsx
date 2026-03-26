@@ -304,7 +304,7 @@ export default function V6Page() {
                 filtered.map((inv, i) => {
                   const st = statusMap[inv.status];
                   return (
-                    <Link key={i} href={`${basePath}/demo/v6/invoice`} style={{ textDecoration: "none", color: "inherit", display: "contents" }}>
+                    <Link key={i} href={"/demo/v6/invoice"} style={{ textDecoration: "none", color: "inherit", display: "contents" }}>
                       <tr style={{
                         borderBottom: "1px solid rgba(255,255,255,0.03)",
                         cursor: "pointer",
