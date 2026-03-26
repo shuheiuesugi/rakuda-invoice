@@ -243,7 +243,7 @@ export default function V2Page() {
 
         {/* Footer nav */}
         <div style={{ marginTop: 24, display: "flex", gap: 12 }}>
-          {[1, 2, 3, 4, 5].map(n => (
+          {[1, 2, 3, 4, 5, 6].map(n => (
             <a key={n} href={`${basePath}/demo/v${n}`} style={{
               padding: "6px 14px",
               borderRadius: 6,

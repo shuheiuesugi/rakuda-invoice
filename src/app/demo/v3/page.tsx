@@ -276,7 +276,7 @@ export default function V3Page() {
 
         {/* Footer nav */}
         <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
-          {[1, 2, 3, 4, 5].map(n => (
+          {[1, 2, 3, 4, 5, 6].map(n => (
             <a key={n} href={`${basePath}/demo/v${n}`} style={{
               padding: "5px 12px",
               borderRadius: 4,
