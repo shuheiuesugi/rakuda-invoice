@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "プライバシーポリシー | ラクダInvoice",
+  title: "プライバシーポリシー | RAKUDAインボイス",
 };
 
 export default function Privacy() {
@@ -26,7 +26,7 @@ export default function Privacy() {
 
             <section>
               <h2>1. はじめに</h2>
-              <p>ラクダInvoice運営事務局（以下「当社」）は、本サービスをご利用いただくお客様の個人情報および請求書関連データの保護に努めています。本プライバシーポリシーでは、当社が収集する情報の種類、利用目的、管理方法についてご説明します。</p>
+              <p>RAKUDAインボイス運営事務局（以下「当社」）は、本サービスをご利用いただくお客様の個人情報および請求書関連データの保護に努めています。本プライバシーポリシーでは、当社が収集する情報の種類、利用目的、管理方法についてご説明します。</p>
             </section>
 
             <section>
@@ -84,7 +84,7 @@ export default function Privacy() {
             <section>
               <h2>9. お問い合わせ</h2>
               <p>本ポリシーに関するお問い合わせは、以下までご連絡ください。</p>
-              <p>ラクダInvoice運営事務局<br />メール: privacy@rakuda-ai.com</p>
+              <p>RAKUDAインボイス運営事務局<br />メール: info@rakuda-ai.com</p>
             </section>
 
             <div className="legal-back">

@@ -1,251 +1,372 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
-export default function BookCallPage() {
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({
-    company: "",
-    name: "",
-    title: "",
-    email: "",
-    phone: "",
-    format: "online",
-    employees: "",
-    message: "",
-  });
+/* ── helpers ───────────────────────────── */
+function getDaysInMonth(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate();
+}
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+function getFirstDayOfWeek(year: number, month: number) {
+  return new Date(year, month, 1).getDay();
+}
+
+const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+const MONTH_NAMES = [
+  "1月", "2月", "3月", "4月", "5月", "6月",
+  "7月", "8月", "9月", "10月", "11月", "12月",
+];
+
+const TIME_SLOTS = [
+  "10:00", "10:30", "11:00", "11:30",
+  "13:00", "13:30", "14:00", "14:30",
+  "15:00", "15:30", "16:00", "16:30",
+  "17:00", "17:30",
+];
+
+/* ── main component ────────────────────── */
+export default function BookCall() {
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [step, setStep] = useState<"calendar" | "form" | "done">("calendar");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [company, setCompany] = useState("");
+
+  /* calendar grid */
+  const calendarDays = useMemo(() => {
+    const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+    const firstDay = getFirstDayOfWeek(currentYear, currentMonth);
+    const cells: (number | null)[] = [];
+    for (let i = 0; i < firstDay; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+    return cells;
+  }, [currentYear, currentMonth]);
+
+  const isDateAvailable = (day: number) => {
+    const d = new Date(currentYear, currentMonth, day);
+    const dow = d.getDay();
+    if (dow === 0 || dow === 6) return false; // weekends
+    if (d < todayStart) return false;
+    return true;
+  };
+
+  const handleDateClick = (day: number) => {
+    if (!isDateAvailable(day)) return;
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    setSelectedDate(dateStr);
+    setSelectedTime(null);
+  };
+
+  const handleTimeClick = (time: string) => {
+    setSelectedTime(time);
+  };
+
+  const handleConfirm = () => {
+    if (selectedDate && selectedTime) {
+      setStep("form");
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (typeof window !== "undefined") { (window as any).dataLayer?.push({ event: "generate_lead", event_label: "book_call" }); }
+    setStep("done");
+  };
+
+  const prevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear(currentYear - 1);
+    } else {
+      setCurrentMonth(currentMonth - 1);
+    }
+  };
+
+  const nextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(currentYear + 1);
+    } else {
+      setCurrentMonth(currentMonth + 1);
+    }
+  };
+
+  const formatDateDisplay = (dateStr: string) => {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    const dow = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
+    return `${m}月${d}日（${dow}）`;
   };
 
   return (
     <>
-      {/* Header */}
+      <style>{`
+        .schedule-page { min-height: 100vh; background: var(--bg-cool, #F8FAFC); padding: calc(var(--header-h, 72px) + 40px) 0 80px; }
+        .schedule-container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+        .schedule-header { text-align: center; margin-bottom: 40px; }
+        .schedule-header .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft, #DBEAFE); color: var(--accent, #3B82F6); font-size: 0.813rem; font-weight: 600; padding: 6px 14px; border-radius: 100px; margin-bottom: 16px; }
+        .schedule-header .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent, #3B82F6); animation: pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .schedule-header h1 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; color: var(--text, #0F172A); margin-bottom: 8px; }
+        .schedule-header p { font-size: 1rem; color: var(--text-secondary, #475569); }
+
+        .schedule-main { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid var(--border, #E2E8F0); }
+
+        /* left: calendar */
+        .schedule-left { padding: 32px; border-right: 1px solid var(--border, #E2E8F0); }
+        .schedule-info { margin-bottom: 24px; }
+        .schedule-info-label { font-size: 0.75rem; color: var(--text-muted, #94A3B8); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+        .schedule-info-title { font-size: 1.125rem; font-weight: 700; color: var(--text, #0F172A); margin-bottom: 4px; }
+        .schedule-info-meta { display: flex; gap: 16px; font-size: 0.813rem; color: var(--text-secondary, #475569); }
+        .schedule-info-meta span { display: flex; align-items: center; gap: 4px; }
+
+        /* calendar */
+        .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .cal-nav-title { font-size: 1rem; font-weight: 700; color: var(--text, #0F172A); }
+        .cal-nav button { background: none; border: 1px solid var(--border, #E2E8F0); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-secondary, #475569); transition: all 0.15s; }
+        .cal-nav button:hover { background: var(--bg-subtle, #F1F5F9); border-color: var(--text-muted, #94A3B8); }
+
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+        .cal-dow { font-size: 0.688rem; font-weight: 600; color: var(--text-muted, #94A3B8); padding: 4px 0 8px; text-transform: uppercase; }
+        .cal-day { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; border-radius: 10px; cursor: default; color: var(--text-muted, #94A3B8); transition: all 0.15s; position: relative; }
+        .cal-day.available { color: var(--text, #0F172A); cursor: pointer; font-weight: 500; }
+        .cal-day.available:hover { background: var(--accent-soft, #DBEAFE); color: var(--accent, #3B82F6); }
+        .cal-day.selected { background: var(--accent, #3B82F6); color: #fff; font-weight: 700; }
+        .cal-day.selected:hover { background: var(--accent-hover, #2563EB); color: #fff; }
+        .cal-day.today::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--accent, #3B82F6); }
+        .cal-day.today.selected::after { background: #fff; }
+
+        /* right: time slots */
+        .schedule-right { padding: 32px; display: flex; flex-direction: column; }
+        .schedule-right-header { font-size: 0.875rem; font-weight: 600; color: var(--text, #0F172A); margin-bottom: 16px; }
+        .schedule-right-empty { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--text-muted, #94A3B8); font-size: 0.875rem; padding: 40px 0; }
+        .time-slots { display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; max-height: 420px; }
+        .time-slot { padding: 12px 16px; border: 1px solid var(--border, #E2E8F0); border-radius: 10px; font-size: 0.875rem; font-weight: 500; color: var(--text, #0F172A); cursor: pointer; transition: all 0.15s; text-align: center; background: #fff; }
+        .time-slot:hover { border-color: var(--accent, #3B82F6); background: var(--accent-soft, #DBEAFE); color: var(--accent, #3B82F6); }
+        .time-slot.selected { background: var(--accent, #3B82F6); color: #fff; border-color: var(--accent, #3B82F6); }
+
+        .schedule-confirm-wrap { margin-top: 16px; }
+        .schedule-confirm-btn { width: 100%; padding: 14px; background: var(--accent, #3B82F6); color: #fff; border: none; border-radius: 10px; font-size: 0.938rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .schedule-confirm-btn:hover { background: var(--accent-hover, #2563EB); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .schedule-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* step 2: minimal form */
+        .schedule-form-step { padding: 40px; }
+        .schedule-form-step h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; color: var(--text, #0F172A); }
+        .schedule-form-step .form-sub { font-size: 0.875rem; color: var(--text-secondary, #475569); margin-bottom: 24px; }
+        .schedule-form-step .selected-slot { display: inline-flex; align-items: center; gap: 8px; background: var(--accent-soft, #DBEAFE); color: var(--accent, #3B82F6); padding: 10px 16px; border-radius: 10px; font-size: 0.875rem; font-weight: 600; margin-bottom: 24px; }
+        .schedule-form-step .selected-slot svg { flex-shrink: 0; }
+        .sform-group { margin-bottom: 16px; }
+        .sform-group label { display: block; font-size: 0.813rem; font-weight: 600; margin-bottom: 6px; color: var(--text, #0F172A); }
+        .sform-group input { width: 100%; padding: 12px 14px; border: 1px solid var(--border, #E2E8F0); border-radius: 10px; font-size: 0.938rem; transition: border-color 0.2s; }
+        .sform-group input:focus { outline: none; border-color: var(--accent, #3B82F6); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+        .sform-group .req { color: #EF4444; }
+        .schedule-form-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .schedule-form-actions .btn-back { flex: 0 0 auto; padding: 14px 20px; background: #fff; border: 1px solid var(--border, #E2E8F0); border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; color: var(--text-secondary, #475569); transition: all 0.15s; }
+        .schedule-form-actions .btn-back:hover { border-color: var(--text-muted, #94A3B8); background: var(--bg-subtle, #F1F5F9); }
+        .schedule-form-actions .btn-submit { flex: 1; padding: 14px; background: var(--accent, #3B82F6); color: #fff; border: none; border-radius: 10px; font-size: 0.938rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .schedule-form-actions .btn-submit:hover { background: var(--accent-hover, #2563EB); }
+
+        /* done */
+        .schedule-done { padding: 60px 40px; text-align: center; }
+        .schedule-done-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--success-soft, #D1FAE5); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .schedule-done h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: var(--text, #0F172A); }
+        .schedule-done p { color: var(--text-secondary, #475569); font-size: 1rem; line-height: 1.75; margin-bottom: 6px; }
+        .schedule-done .slot-recap { display: inline-flex; align-items: center; gap: 8px; background: var(--accent-soft, #DBEAFE); color: var(--accent, #3B82F6); padding: 10px 20px; border-radius: 10px; font-weight: 600; margin: 20px 0; font-size: 0.938rem; }
+        .schedule-done .back-link { display: inline-block; margin-top: 20px; color: var(--text-muted, #94A3B8); font-size: 0.875rem; text-decoration: none; }
+        .schedule-done .back-link:hover { color: var(--text, #0F172A); }
+
+        /* benefits bar */
+        .schedule-benefits { display: flex; justify-content: center; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
+        .schedule-benefits span { display: flex; align-items: center; gap: 6px; font-size: 0.813rem; color: var(--text-secondary, #475569); }
+        .schedule-benefits .bcheck { color: var(--success, #10B981); font-weight: 700; }
+
+        @media (max-width: 768px) {
+          .schedule-main { grid-template-columns: 1fr; }
+          .schedule-left { border-right: none; border-bottom: 1px solid var(--border, #E2E8F0); }
+          .schedule-right { min-height: 200px; }
+          .time-slots { max-height: 260px; display: grid; grid-template-columns: repeat(2, 1fr); }
+          .schedule-benefits { flex-direction: column; align-items: center; gap: 8px; }
+        }
+      `}</style>
+
       <header className="sub-header">
         <div className="sub-header-inner">
-          <a href="./" className="sub-header-logo" style={{ color: "#1a1a2e" }}>
+          <a href="./" className="header-logo" style={{ display: "flex", alignItems: "center", gap: "0" }}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 40" style={{ height: "20px", width: "auto" }}>
-              <path d="M4,32 C4,32 12,6 24,6 C34,6 28,28 36,28 C44,28 38,4 48,4 C60,4 68,32 68,32" stroke="currentColor" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-              <text x="80" y="28" fontFamily="'Helvetica Neue',Arial,sans-serif" fontSize="22" fontWeight="300" fill="currentColor" letterSpacing="3">RAKUDAインボイス</text>
+              <path d="M4,32 C4,32 12,6 24,6 C34,6 28,28 36,28 C44,28 38,4 48,4 C60,4 68,32 68,32" stroke="#1a1a2e" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+              <text x="80" y="28" fontFamily="'Helvetica Neue',Arial,sans-serif" fontSize="22" fontWeight="300" fill="#1a1a2e" letterSpacing="3">RAKUDAインボイス</text>
             </svg>
           </a>
         </div>
       </header>
 
-      <main className="book-call-page">
-        <div className="container">
-          {submitted ? (
-            <div className="book-call-thankyou">
-              <div className="book-call-thankyou-icon">&#10003;</div>
-              <h1>お問い合わせありがとうございます</h1>
-              <p>
-                内容を確認のうえ、2営業日以内にご連絡いたします。<br />
-                お急ぎの場合は、メールにてお問い合わせください。
-              </p>
-              <a href="./" className="book-call-back-btn">トップページに戻る</a>
-            </div>
-          ) : (
-            <div className="book-call-layout">
-              {/* Form Section */}
-              <div className="book-call-form-section">
-                <h1 className="book-call-title">導入相談を予約する</h1>
-                <p className="book-call-subtitle">
-                  ラクダInvoiceの導入をご検討中の企業様向けに、オンラインまたは対面での無料相談を承っております。
-                </p>
+      <main className="schedule-page">
+        <div className="schedule-container">
+          <div className="schedule-header">
+            <div className="badge">15分の無料相談</div>
+            <h1>日程を選んで、すぐに予約</h1>
+            <p>ご都合のよい日時を選ぶだけ。確認メールが届きます。</p>
+          </div>
 
-                <form className="book-call-form" onSubmit={handleSubmit}>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label" htmlFor="company">
-                        会社名 <span className="form-required">*</span>
-                      </label>
-                      <input
-                        id="company"
-                        name="company"
-                        type="text"
-                        className="form-input"
-                        placeholder="株式会社ラクダ"
-                        value={form.company}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label" htmlFor="name">
-                        お名前 <span className="form-required">*</span>
-                      </label>
-                      <input
-                        id="name"
-                        name="name"
-                        type="text"
-                        className="form-input"
-                        placeholder="山田 太郎"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                      />
+          <div className="schedule-main">
+            {step === "calendar" && (
+              <>
+                {/* LEFT: Calendar */}
+                <div className="schedule-left">
+                  <div className="schedule-info">
+                    <div className="schedule-info-label">RAKUDAインボイス</div>
+                    <div className="schedule-info-title">無料相談・デモ</div>
+                    <div className="schedule-info-meta">
+                      <span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2"/><path d="M7 4v3.5l2.5 1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                        15分
+                      </span>
+                      <span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.2"/><path d="M1 5h12" stroke="currentColor" strokeWidth="1.2"/></svg>
+                        Zoom / Google Meet
+                      </span>
                     </div>
                   </div>
 
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label" htmlFor="title">役職</label>
-                      <input
-                        id="title"
-                        name="title"
-                        type="text"
-                        className="form-input"
-                        placeholder="経理部長"
-                        value={form.title}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label" htmlFor="email">
-                        メールアドレス <span className="form-required">*</span>
-                      </label>
-                      <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        className="form-input"
-                        placeholder="yamada@example.com"
-                        value={form.email}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
+                  <div className="cal-nav">
+                    <button onClick={prevMonth} aria-label="前月">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </button>
+                    <span className="cal-nav-title">{currentYear}年 {MONTH_NAMES[currentMonth]}</span>
+                    <button onClick={nextMonth} aria-label="翌月">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </button>
                   </div>
 
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label" htmlFor="phone">電話番号</label>
-                      <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        className="form-input"
-                        placeholder="03-1234-5678"
-                        value={form.phone}
-                        onChange={handleChange}
-                      />
+                  <div className="cal-grid">
+                    {WEEKDAYS.map((d) => (
+                      <div key={d} className="cal-dow">{d}</div>
+                    ))}
+                    {calendarDays.map((day, i) => {
+                      if (day === null) return <div key={`e${i}`} className="cal-day" />;
+                      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                      const avail = isDateAvailable(day);
+                      const isToday = today.getFullYear() === currentYear && today.getMonth() === currentMonth && today.getDate() === day;
+                      const isSel = selectedDate === dateStr;
+                      return (
+                        <div
+                          key={day}
+                          className={`cal-day${avail ? " available" : ""}${isSel ? " selected" : ""}${isToday ? " today" : ""}`}
+                          onClick={() => avail && handleDateClick(day)}
+                        >
+                          {day}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* RIGHT: Time slots */}
+                <div className="schedule-right">
+                  {selectedDate ? (
+                    <>
+                      <div className="schedule-right-header">
+                        {formatDateDisplay(selectedDate)} の空き枠
+                      </div>
+                      <div className="time-slots">
+                        {TIME_SLOTS.map((t) => (
+                          <div
+                            key={t}
+                            className={`time-slot${selectedTime === t ? " selected" : ""}`}
+                            onClick={() => handleTimeClick(t)}
+                          >
+                            {t}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="schedule-confirm-wrap">
+                        <button
+                          className="schedule-confirm-btn"
+                          disabled={!selectedTime}
+                          onClick={handleConfirm}
+                        >
+                          {selectedTime ? `${formatDateDisplay(selectedDate)} ${selectedTime} で予約する` : "時間を選択してください"}
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="schedule-right-empty">
+                      <div>
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style={{ margin: "0 auto 12px", display: "block", opacity: 0.4 }}>
+                          <rect x="3" y="5" width="26" height="24" rx="4" stroke="currentColor" strokeWidth="1.5"/>
+                          <path d="M3 12h26" stroke="currentColor" strokeWidth="1.5"/>
+                          <path d="M10 2v5M22 2v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
+                        左のカレンダーから<br />日付を選んでください
+                      </div>
                     </div>
-                    <div className="form-group">
-                      <label className="form-label" htmlFor="format">
-                        ご希望の相談形式 <span className="form-required">*</span>
-                      </label>
-                      <select
-                        id="format"
-                        name="format"
-                        className="form-input"
-                        value={form.format}
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="online">オンライン（Zoom / Google Meet）</option>
-                        <option value="visit">対面（ご来社）</option>
-                        <option value="phone">電話</option>
-                      </select>
-                    </div>
-                  </div>
+                  )}
+                </div>
+              </>
+            )}
 
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="employees">
-                      導入予定人数
-                    </label>
-                    <select
-                      id="employees"
-                      name="employees"
-                      className="form-input"
-                      value={form.employees}
-                      onChange={handleChange}
-                    >
-                      <option value="">選択してください</option>
-                      <option value="1-5">1〜5名</option>
-                      <option value="6-20">6〜20名</option>
-                      <option value="21-50">21〜50名</option>
-                      <option value="51-100">51〜100名</option>
-                      <option value="101+">101名以上</option>
-                    </select>
+            {step === "form" && (
+              <div className="schedule-form-step" style={{ gridColumn: "1 / -1" }}>
+                <h2>あと少しで予約完了</h2>
+                <p className="form-sub">以下を入力して予約を確定してください。</p>
+                <div className="selected-slot">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="13" rx="2" stroke="currentColor" strokeWidth="1.2"/><path d="M1 6h14" stroke="currentColor" strokeWidth="1.2"/><path d="M5 1v3M11 1v3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                  {selectedDate && formatDateDisplay(selectedDate)} {selectedTime}
+                </div>
+                <form onSubmit={handleSubmit}>
+                  <div className="sform-group">
+                    <label>お名前 <span className="req">*</span></label>
+                    <input type="text" required placeholder="田中 太郎" value={name} onChange={(e) => setName(e.target.value)} />
                   </div>
-
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="message">
-                      ご相談内容・ご質問
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      className="form-textarea"
-                      rows={5}
-                      placeholder="導入についてのご質問やご要望がございましたらご記入ください。"
-                      value={form.message}
-                      onChange={handleChange}
-                    />
+                  <div className="sform-group">
+                    <label>メールアドレス <span className="req">*</span></label>
+                    <input type="email" required placeholder="tanaka@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                   </div>
-
-                  <button type="submit" className="form-submit-btn">
-                    相談を予約する
-                  </button>
+                  <div className="sform-group">
+                    <label>会社名</label>
+                    <input type="text" placeholder="ラクダ株式会社" value={company} onChange={(e) => setCompany(e.target.value)} />
+                  </div>
+                  <div className="schedule-form-actions">
+                    <button type="button" className="btn-back" onClick={() => setStep("calendar")}>
+                      &#8592; 日時を変更
+                    </button>
+                    <button type="submit" className="btn-submit">
+                      予約を確定する
+                    </button>
+                  </div>
                 </form>
               </div>
+            )}
 
-              {/* Info Section */}
-              <div className="book-call-info-section">
-                <div className="book-call-info-card">
-                  <h2 className="book-call-info-title">無料相談でわかること</h2>
-                  <ul className="book-call-info-list">
-                    <li>
-                      <span className="book-call-info-icon">&#9889;</span>
-                      <div>
-                        <strong>貴社に最適なプランのご提案</strong>
-                        <p>利用人数や請求書発行頻度に応じた最適なプランをご提案いたします。</p>
-                      </div>
-                    </li>
-                    <li>
-                      <span className="book-call-info-icon">&#128640;</span>
-                      <div>
-                        <strong>導入・セットアップのサポート</strong>
-                        <p>インボイス登録番号の設定や会計ソフト連携など、スムーズな導入を支援します。</p>
-                      </div>
-                    </li>
-                    <li>
-                      <span className="book-call-info-icon">&#128202;</span>
-                      <div>
-                        <strong>ROI試算・効果シミュレーション</strong>
-                        <p>請求書作業の時間短縮効果を具体的な数値でお見せします。</p>
-                      </div>
-                    </li>
-                    <li>
-                      <span className="book-call-info-icon">&#128274;</span>
-                      <div>
-                        <strong>セキュリティ・コンプライアンス対応</strong>
-                        <p>電子帳簿保存法やインボイス制度への対応状況についてご説明します。</p>
-                      </div>
-                    </li>
-                  </ul>
+            {step === "done" && (
+              <div className="schedule-done" style={{ gridColumn: "1 / -1" }}>
+                <div className="schedule-done-icon">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </div>
-
-                <div className="book-call-contact-card">
-                  <h3>その他のお問い合わせ</h3>
-                  <p>
-                    メール：<a href="mailto:support@rakuda-invoice.com">support@rakuda-invoice.com</a>
-                  </p>
-                  <p>
-                    営業時間：平日 10:00〜18:00（土日祝休み）
-                  </p>
+                <h2>予約が確定しました</h2>
+                <p>{email} に確認メールをお送りしました。</p>
+                <div className="slot-recap">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="13" rx="2" stroke="currentColor" strokeWidth="1.2"/><path d="M1 6h14" stroke="currentColor" strokeWidth="1.2"/><path d="M5 1v3M11 1v3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                  {selectedDate && formatDateDisplay(selectedDate)} {selectedTime}
                 </div>
+                <p>当日はZoom / Google Meetのリンクをお送りします。</p>
+                <a href="./" className="back-link">&larr; トップページに戻る</a>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
+          <div className="schedule-benefits">
+            <span><span className="bcheck">&#x2714;</span> 請求書業務の課題ヒアリング</span>
+            <span><span className="bcheck">&#x2714;</span> Zoom / Google Meet / 電話OK</span>
+            <span><span className="bcheck">&#x2714;</span> 最短翌営業日に対応</span>
+          </div>
         </div>
       </main>
 

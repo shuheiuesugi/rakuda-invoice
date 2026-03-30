@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "特定商取引法に基づく表記 | ラクダInvoice",
+  title: "特定商取引法に基づく表記 | RAKUDAインボイス",
 };
 
 export default function Tokushoho() {
@@ -28,7 +28,7 @@ export default function Tokushoho() {
               <tbody>
                 <tr>
                   <th>販売業者</th>
-                  <td>ラクダInvoice運営事務局</td>
+                  <td>RAKUDAインボイス運営事務局</td>
                 </tr>
                 <tr>
                   <th>運営統括責任者</th>
@@ -44,19 +44,18 @@ export default function Tokushoho() {
                 </tr>
                 <tr>
                   <th>メールアドレス</th>
-                  <td>support@rakuda-ai.com</td>
+                  <td>info@rakuda-ai.com</td>
                 </tr>
                 <tr>
                   <th>サービスの名称</th>
-                  <td>ラクダInvoice（AI請求書作成ツール）</td>
+                  <td>RAKUDAインボイス（AI請求書作成サービス）</td>
                 </tr>
                 <tr>
                   <th>販売価格</th>
                   <td>
-                    Starterプラン: 無料<br />
-                    Standardプラン: 月額1,980円（税抜）<br />
-                    Enterpriseプラン: 月額4,980円（税抜）<br />
-                    ※年額プランあり（2ヶ月分割引）
+                    Freeプラン: ¥0（無料）<br />
+                    Proプラン: 月額980円（税抜）<br />
+                    Enterpriseプラン: カスタム料金（お問い合わせください）
                   </td>
                 </tr>
                 <tr>

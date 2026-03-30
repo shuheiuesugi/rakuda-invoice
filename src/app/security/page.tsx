@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "セキュリティ | ラクダInvoice",
+  title: "セキュリティ | RAKUDAインボイス",
 };
 
 export default function Security() {
@@ -31,37 +31,49 @@ export default function Security() {
 
             <div className="security-grid">
               <div className="security-card">
-                <div className="security-card-icon">&#x1F512;</div>
+                <div className="security-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
                 <h3>通信の暗号化</h3>
                 <p>すべての通信はTLS 1.3で暗号化。中間者攻撃やデータ傍受を防止します。HSTS（HTTP Strict Transport Security）も有効化済みです。</p>
               </div>
 
               <div className="security-card">
-                <div className="security-card-icon">&#x1F5C4;&#xFE0F;</div>
+                <div className="security-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                </div>
                 <h3>保存時の暗号化</h3>
                 <p>請求書データを含むすべてのデータは、AES-256で暗号化して保存。暗号鍵は定期的にローテーションされます。</p>
               </div>
 
               <div className="security-card">
-                <div className="security-card-icon">&#x1F6E1;&#xFE0F;</div>
+                <div className="security-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
                 <h3>SOC 2 Type II</h3>
                 <p>SOC 2 Type II認証を取得済み。セキュリティ、可用性、機密保持の統制が第三者機関により監査されています。</p>
               </div>
 
               <div className="security-card">
-                <div className="security-card-icon">&#x1F4D1;</div>
+                <div className="security-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
                 <h3>電子帳簿保存法対応</h3>
                 <p>電子帳簿保存法の保存要件に完全対応。タイムスタンプ付与、検索機能、訂正削除の履歴管理を標準装備しています。</p>
               </div>
 
               <div className="security-card">
-                <div className="security-card-icon">&#x1F50D;</div>
+                <div className="security-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
                 <h3>定期セキュリティ監査</h3>
                 <p>年2回の第三者ペネトレーションテストと、継続的な脆弱性スキャンを実施。発見された問題は即座に対処します。</p>
               </div>
 
               <div className="security-card">
-                <div className="security-card-icon">&#x1F4CA;</div>
+                <div className="security-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
                 <h3>データ保持ポリシー</h3>
                 <p>請求書データの保持期間はお客様が管理画面から設定可能。電子帳簿保存法で求められる7年間の保存にも対応します。</p>
               </div>
@@ -80,7 +92,7 @@ export default function Security() {
             <section>
               <h2>脆弱性報告</h2>
               <p>セキュリティに関する脆弱性を発見された場合は、以下までご報告ください。責任ある開示に基づき対応いたします。</p>
-              <p>メール: security@rakuda-ai.com</p>
+              <p>メール: info@rakuda-ai.com</p>
             </section>
 
             <div className="legal-back">

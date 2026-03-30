@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "利用規約 | ラクダInvoice",
+  title: "利用規約 | RAKUDAインボイス",
 };
 
 export default function Terms() {
@@ -26,7 +26,7 @@ export default function Terms() {
 
             <section>
               <h2>第1条（適用）</h2>
-              <p>本利用規約（以下「本規約」）は、ラクダInvoice運営事務局（以下「当社」）が提供するAI請求書作成サービス「ラクダInvoice」（以下「本サービス」）の利用に関する条件を定めるものです。ユーザーは本規約に同意の上、本サービスを利用するものとします。</p>
+              <p>本利用規約（以下「本規約」）は、RAKUDAインボイス運営事務局（以下「当社」）が提供するAI請求書作成サービス「RAKUDAインボイス」（以下「本サービス」）の利用に関する条件を定めるものです。ユーザーは本規約に同意の上、本サービスを利用するものとします。</p>
             </section>
 
             <section>
@@ -48,8 +48,9 @@ export default function Terms() {
               <h2>第4条（料金・支払い）</h2>
               <p>本サービスの料金は、料金ページに掲載するプランに基づきます。</p>
               <ol>
-                <li>Standardプラン: 月額1,980円（税抜）</li>
-                <li>Enterpriseプラン: 月額4,980円（税抜）</li>
+                <li>Freeプラン: 無料（¥0）</li>
+                <li>Proプラン: 月額980円（税抜）</li>
+                <li>Enterpriseプラン: カスタム料金（お問い合わせください）</li>
               </ol>
               <p>有料プランの料金は月額または年額の前払いとし、クレジットカードまたは請求書払いにてお支払いいただきます。年額プランの途中解約による日割り返金には対応いたします。</p>
             </section>
