@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "月額980円で請求書無制限 — 他社の1/3の価格 | ラクダInvoice",
+  title: "請求書作成コスト最大90%削減 — 月額¥980のAI請求書 | RAKUDAインボイス",
   robots: { index: false, follow: false },
 };
 
 export default function CostLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <>{children}</>;
 }
