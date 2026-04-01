@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ============================================================
-   RAKUDAインボイス — AI請求書自動化 LP
+   RAKUDAインボイス — AI請求書自動化 LP (v2 overhaul)
    ============================================================ */
 
 // Intersection Observer hook with varied animation directions
@@ -71,11 +71,237 @@ const ArrowRight = () => (
   </svg>
 );
 
+const SunIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="5" />
+    <line x1="12" y1="1" x2="12" y2="3" />
+    <line x1="12" y1="21" x2="12" y2="23" />
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+    <line x1="1" y1="12" x2="3" y2="12" />
+    <line x1="21" y1="12" x2="23" y2="12" />
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  </svg>
+);
+
+// Hero Live Demo Component
+function HeroLiveDemo() {
+  const [step, setStep] = useState(0);
+  const [typedClient, setTypedClient] = useState("");
+  const [typedAmount, setTypedAmount] = useState("");
+
+  const clientName = "株式会社ABC";
+  const amountText = "¥1,200,000";
+
+  useEffect(() => {
+    const timings = [2500, 2500, 2500, 2500, 2000];
+    const timer = setTimeout(() => {
+      setStep((s) => (s + 1) % 5);
+      setTypedClient("");
+      setTypedAmount("");
+    }, timings[step]);
+    return () => clearTimeout(timer);
+  }, [step]);
+
+  // Typewriter effect for step 1
+  useEffect(() => {
+    if (step !== 1) return;
+    let i = 0;
+    const clientInterval = setInterval(() => {
+      i++;
+      if (i <= clientName.length) {
+        setTypedClient(clientName.slice(0, i));
+      } else if (i - clientName.length <= amountText.length) {
+        setTypedAmount(amountText.slice(0, i - clientName.length));
+      } else {
+        clearInterval(clientInterval);
+      }
+    }, 80);
+    return () => clearInterval(clientInterval);
+  }, [step]);
+
+  const screenStyle: React.CSSProperties = {
+    padding: "16px",
+    color: "#E2E8F0",
+    minHeight: "220px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+  };
+
+  const labelStyle: React.CSSProperties = { fontSize: "9px", color: "#64748B", marginBottom: "4px", letterSpacing: "0.05em" };
+  const inputStyle: React.CSSProperties = { background: "#1E293B", borderRadius: "6px", padding: "7px 10px", fontSize: "11px", color: "#E2E8F0", border: "1px solid #334155" };
+
+  return (
+    <div className="hero-visual">
+      <div className="hero-browser-frame">
+        <div className="hero-browser-outer">
+          <div className="hero-browser-bar">
+            <div className="browser-dots">
+              <span className="dot red" />
+              <span className="dot yellow" />
+              <span className="dot green" />
+            </div>
+            <div className="browser-url">invoice.rakuda-ai.com</div>
+          </div>
+          <div className="hero-browser-screen" style={{ background: "#0F172A" }}>
+            <div className="hero-browser-ui" style={screenStyle}>
+              {/* Step 0: Form idle state */}
+              {step === 0 && (
+                <div style={{ animation: "fadeIn 0.4s ease" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", color: "#94A3B8" }}>請求書を作成</span>
+                    <span style={{ fontSize: "10px", background: "#10B981", color: "#fff", padding: "2px 8px", borderRadius: "10px", fontWeight: 600 }}>AI補完 ON</span>
+                  </div>
+                  <div style={{ marginBottom: "10px" }}>
+                    <div style={labelStyle}>取引先</div>
+                    <div style={{ ...inputStyle, color: "#64748B" }}>選択してください...</div>
+                  </div>
+                  <div style={{ marginBottom: "10px" }}>
+                    <div style={labelStyle}>金額</div>
+                    <div style={{ ...inputStyle, color: "#64748B" }}>---</div>
+                  </div>
+                  <button style={{ marginTop: "8px", width: "100%", padding: "8px", background: "#1E293B", color: "#64748B", border: "1px solid #334155", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "default" }}>
+                    入力を開始してください
+                  </button>
+                </div>
+              )}
+
+              {/* Step 1: Typing client + amount */}
+              {step === 1 && (
+                <div style={{ animation: "fadeIn 0.4s ease" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", color: "#94A3B8" }}>請求書を作成</span>
+                    <span style={{ fontSize: "10px", background: "#10B981", color: "#fff", padding: "2px 8px", borderRadius: "10px", fontWeight: 600 }}>AI補完 ON</span>
+                  </div>
+                  <div style={{ marginBottom: "10px" }}>
+                    <div style={labelStyle}>取引先</div>
+                    <div style={{ ...inputStyle, borderColor: "#3B82F6" }}>
+                      {typedClient}
+                      <span style={{ borderRight: "2px solid #3B82F6", animation: "blink 0.8s infinite", marginLeft: "1px" }}>&nbsp;</span>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: "10px" }}>
+                    <div style={labelStyle}>金額</div>
+                    <div style={{ ...inputStyle, borderColor: typedAmount ? "#3B82F6" : "#334155" }}>
+                      {typedAmount || "---"}
+                    </div>
+                  </div>
+                  <button style={{ marginTop: "8px", width: "100%", padding: "8px", background: "linear-gradient(135deg, #3B82F6, #2563EB)", color: "#fff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>
+                    PDF生成
+                  </button>
+                </div>
+              )}
+
+              {/* Step 2: Generating PDF spinner */}
+              {step === 2 && (
+                <div style={{ animation: "fadeIn 0.4s ease", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "200px" }}>
+                  <div className="demo-spinner" />
+                  <span style={{ fontSize: "12px", color: "#94A3B8", marginTop: "16px", fontWeight: 500 }}>PDF生成中...</span>
+                  <span style={{ fontSize: "10px", color: "#64748B", marginTop: "6px" }}>株式会社ABC / ¥1,200,000</span>
+                </div>
+              )}
+
+              {/* Step 3: PDF preview + action buttons */}
+              {step === 3 && (
+                <div style={{ animation: "fadeIn 0.4s ease" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 600, color: "#94A3B8" }}>PDFプレビュー</span>
+                    <span style={{ fontSize: "10px", background: "#3B82F6", color: "#fff", padding: "2px 8px", borderRadius: "10px", fontWeight: 600 }}>完了</span>
+                  </div>
+                  <div style={{ background: "#fff", borderRadius: "6px", padding: "12px", marginBottom: "12px" }}>
+                    <div style={{ fontSize: "8px", color: "#9CA3AF", marginBottom: "4px" }}>請求書 No. INV-2026-0401</div>
+                    <div style={{ fontSize: "11px", color: "#111", fontWeight: 600, marginBottom: "2px" }}>株式会社ABC 御中</div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "9px", color: "#6B7280", borderTop: "1px solid #E5E7EB", paddingTop: "6px", marginTop: "6px" }}>
+                      <span>コンサルティング業務</span>
+                      <span style={{ fontWeight: 600, color: "#111" }}>¥1,200,000</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#111", fontWeight: 700, borderTop: "1px solid #E5E7EB", paddingTop: "6px", marginTop: "6px" }}>
+                      <span>合計（税込）</span>
+                      <span>¥1,320,000</span>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button style={{ flex: 1, padding: "7px", background: "#1E293B", color: "#E2E8F0", border: "1px solid #334155", borderRadius: "6px", fontSize: "10px", fontWeight: 600, cursor: "pointer" }}>
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
+                        <path d="M6 2v6M3 5l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M2 9h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                      </svg>
+                      ダウンロード
+                    </button>
+                    <button style={{ flex: 1, padding: "7px", background: "linear-gradient(135deg, #3B82F6, #2563EB)", color: "#fff", border: "none", borderRadius: "6px", fontSize: "10px", fontWeight: 600, cursor: "pointer" }}>
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
+                        <path d="M2 3h8v7H2z" stroke="currentColor" strokeWidth="1.2" />
+                        <path d="M2 4l4 3 4-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                      </svg>
+                      メール送信
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 4: Completed check */}
+              {step === 4 && (
+                <div style={{ animation: "fadeIn 0.4s ease", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "200px" }}>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(16, 185, 129, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M6 12l4 4 8-8" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: "14px", color: "#E2E8F0", fontWeight: 600 }}>請求書作成完了</span>
+                  <span style={{ fontSize: "10px", color: "#64748B", marginTop: "6px" }}>株式会社ABC に送信しました</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="hero-floating-card card-1">
+          <div className="floating-card-inner">
+            <div className="floating-card-icon check">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="9" cy="9" r="7" stroke="#10B981" strokeWidth="1.5" />
+                <path d="M6 9l2 2 4-4" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <div className="floating-card-text">請求書を送付しました</div>
+              <div className="floating-card-sub">株式会社ABC / 30秒</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="hero-floating-card card-2">
+          <div className="floating-card-inner">
+            <div className="floating-card-icon slack">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="9" cy="9" r="7" stroke="#3B82F6" strokeWidth="1.5" />
+                <path d="M9 6v3l2 2" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <div className="floating-card-text">入金確認</div>
+              <div className="floating-card-sub">¥1,320,000 / 自動消込済み</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // FAQ
 const faqData = [
   {
-    q: "無料プランと有料プランで、請求書の見た目は変わりますか?",
-    a: "いいえ、同じAIエンジンを使っているので品質は同一です。無料プランは月5通の発行枠があるだけで、機能制限はありません。",
+    q: "無料トライアル後の料金はどうなりますか?",
+    a: "7日間の無料トライアル後、自動的にProプラン（月額¥980）に移行します。トライアル中にいつでもキャンセル可能で、その場合は一切課金されません。",
   },
   {
     q: "インボイス制度の登録番号はどうやって設定しますか?",
@@ -102,6 +328,7 @@ const faqData = [
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   const sectionRefs = {
     hero: useScrollReveal(),
@@ -124,13 +351,29 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Load theme from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("lp-theme");
+    if (saved === "light" || saved === "dark") {
+      setTheme(saved);
+    }
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      localStorage.setItem("lp-theme", next);
+      return next;
+    });
+  }, []);
+
   const toggleFaq = useCallback((index: number) => {
     setOpenFaq((prev) => (prev === index ? null : index));
   }, []);
 
   return (
-    <>
-      {/* ── HEADER ─────────────────────────────────── */}
+    <div className={theme === "light" ? "lp-light" : undefined}>
+      {/* -- HEADER -- */}
       <header className={`header${scrolled ? " scrolled" : ""}`}>
         <div className="header-inner">
           <a href="#" className="header-logo" style={{ display: "flex", alignItems: "center", gap: "0" }}>
@@ -150,11 +393,19 @@ export default function Home() {
           </nav>
 
           <div className="header-cta-group">
+            <button
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "ライトモードに切替" : "ダークモードに切替"}
+              title={theme === "dark" ? "ライトモード" : "ダークモード"}
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
             <a href="./book-call" className="btn btn-sm btn-dark">
               無料相談
             </a>
             <a href="./signup" className="btn btn-sm btn-cta-call">
-              無料で始める
+              7日間無料で試す
             </a>
           </div>
 
@@ -167,7 +418,7 @@ export default function Home() {
       </header>
 
       <main>
-        {/* ── HERO ─────────────────────────────────── */}
+        {/* -- HERO -- */}
         <section className="hero" ref={sectionRefs.hero}>
           <div className="hero-grid-pattern" />
           <div className="container">
@@ -190,10 +441,12 @@ export default function Home() {
                 <p className="hero-subtitle">
                   取引先を選んで明細を入力するだけ。AIが自動で請求書を作成し、
                   ワンクリックで送付。入金管理まで自動化します。
+                  <br />
+                  <strong style={{ color: "#93C5FD" }}>7日間無料・いつでも解約可能</strong>
                 </p>
                 <div className="hero-actions">
                   <a href="./signup" className="btn btn-lg btn-cta-call">
-                    無料で始める
+                    7日間無料で試す
                     <ArrowRight />
                   </a>
                   <a href="./book-call" className="btn btn-lg btn-dark">
@@ -220,103 +473,17 @@ export default function Home() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  月5通まで無料 ・ クレジットカード不要
+                  いつでも解約可能
                 </div>
               </div>
 
-              {/* Browser Mockup — 請求書作成画面風 */}
-              <div className="hero-visual">
-                <div className="hero-browser-frame">
-                  <div className="hero-browser-outer">
-                    <div className="hero-browser-bar">
-                      <div className="browser-dots">
-                        <span className="dot red" />
-                        <span className="dot yellow" />
-                        <span className="dot green" />
-                      </div>
-                      <div className="browser-url">invoice.rakuda-ai.com/create</div>
-                    </div>
-                    <div className="hero-browser-screen" style={{ background: "#0F172A" }}>
-                      <div className="hero-browser-ui" style={{ padding: "16px", color: "#E2E8F0" }}>
-                        {/* Header bar */}
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
-                          <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", color: "#94A3B8" }}>請求書を作成</span>
-                          <span style={{ fontSize: "10px", background: "#10B981", color: "#fff", padding: "2px 8px", borderRadius: "10px", fontWeight: 600 }}>AI補完 ON</span>
-                        </div>
-                        {/* Client field */}
-                        <div style={{ marginBottom: "10px" }}>
-                          <div style={{ fontSize: "9px", color: "#64748B", marginBottom: "4px", letterSpacing: "0.05em" }}>取引先</div>
-                          <div style={{ background: "#1E293B", borderRadius: "6px", padding: "7px 10px", fontSize: "11px", color: "#E2E8F0", border: "1px solid #334155" }}>
-                            株式会社サンプル
-                          </div>
-                        </div>
-                        {/* Invoice table */}
-                        <div style={{ background: "#1E293B", borderRadius: "6px", overflow: "hidden", marginBottom: "10px", border: "1px solid #334155" }}>
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 52px 64px", gap: "0", borderBottom: "1px solid #334155", padding: "5px 8px" }}>
-                            <span style={{ fontSize: "9px", color: "#64748B" }}>品目</span>
-                            <span style={{ fontSize: "9px", color: "#64748B", textAlign: "right" as const }}>数量</span>
-                            <span style={{ fontSize: "9px", color: "#64748B", textAlign: "right" as const }}>金額</span>
-                          </div>
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 52px 64px", padding: "6px 8px", borderBottom: "1px solid #1E293B" }}>
-                            <span style={{ fontSize: "10px", color: "#E2E8F0" }}>Webデザイン制作</span>
-                            <span style={{ fontSize: "10px", color: "#E2E8F0", textAlign: "right" as const }}>1</span>
-                            <span style={{ fontSize: "10px", color: "#E2E8F0", textAlign: "right" as const }}>¥150,000</span>
-                          </div>
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 52px 64px", padding: "6px 8px" }}>
-                            <span style={{ fontSize: "10px", color: "#94A3B8", fontStyle: "italic" }}>AIが次の品目を提案中...</span>
-                            <span style={{ fontSize: "10px", color: "#94A3B8", textAlign: "right" as const }}>—</span>
-                            <span style={{ fontSize: "10px", color: "#94A3B8", textAlign: "right" as const }}>—</span>
-                          </div>
-                        </div>
-                        {/* Total */}
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 8px", background: "#1E293B", borderRadius: "6px", border: "1px solid #334155" }}>
-                          <span style={{ fontSize: "10px", color: "#94A3B8" }}>合計（税込）</span>
-                          <span style={{ fontSize: "13px", fontWeight: 700, color: "#38BDF8" }}>¥165,000</span>
-                        </div>
-                        {/* Send button */}
-                        <button style={{ marginTop: "10px", width: "100%", padding: "8px", background: "linear-gradient(135deg, #3B82F6, #2563EB)", color: "#fff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer", letterSpacing: "0.05em" }}>
-                          ワンクリックで送付
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="hero-floating-card card-1">
-                    <div className="floating-card-inner">
-                      <div className="floating-card-icon check">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                          <circle cx="9" cy="9" r="7" stroke="#10B981" strokeWidth="1.5" />
-                          <path d="M6 9l2 2 4-4" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="floating-card-text">請求書を送付しました</div>
-                        <div className="floating-card-sub">株式会社サンプル ・ 30秒</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="hero-floating-card card-2">
-                    <div className="floating-card-inner">
-                      <div className="floating-card-icon slack">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                          <circle cx="9" cy="9" r="7" stroke="#3B82F6" strokeWidth="1.5" />
-                          <path d="M9 6v3l2 2" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="floating-card-text">入金確認</div>
-                        <div className="floating-card-sub">¥165,000 ・ 自動消込済み</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Browser Mockup -- Live Demo Animation */}
+              <HeroLiveDemo />
             </div>
           </div>
         </section>
 
-        {/* ── SOCIAL PROOF (STATS BAR) ──────────────── */}
+        {/* -- SOCIAL PROOF (STATS BAR) -- */}
         <section className="social-proof" ref={sectionRefs.socialProof}>
           <div className="container">
             <div className="social-proof-inner">
@@ -345,7 +512,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── PAIN POINT ───────────────────────────── */}
+        {/* -- PAIN POINT -- */}
         <section className="pain-section" ref={sectionRefs.pain}>
           <div className="container">
             <div className="pain-grid">
@@ -405,7 +572,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── STATS BAR ────────────────────────────── */}
+        {/* -- STATS BAR -- */}
         <section className="stats-bar" ref={sectionRefs.stats}>
           <div className="stats-bar-inner">
             <div className="stat-item animate-on-scroll">
@@ -416,9 +583,9 @@ export default function Home() {
             </div>
             <div className="stat-item animate-on-scroll delay-1">
               <div className="stat-number">
-                月5<span className="stat-unit">通</span>
+                毎日57<span className="stat-unit">分</span>
               </div>
-              <div className="stat-label">無料で利用可能</div>
+              <div className="stat-label">削減時間（平均）</div>
             </div>
             <div className="stat-item animate-on-scroll delay-2">
               <div className="stat-number">
@@ -435,7 +602,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── FLOW（4ステップ）────────────────────── */}
+        {/* -- FLOW（4ステップ） -- */}
         <section className="qr-flow" ref={sectionRefs.flow}>
           <div className="container">
             <div className="qr-flow-header">
@@ -521,7 +688,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── FEATURES ─────────────────────────────── */}
+        {/* -- FEATURES -- */}
         <section className="features" id="features" ref={sectionRefs.features}>
           <div className="container">
             <div className="features-header animate-on-scroll">
@@ -613,22 +780,21 @@ export default function Home() {
               <div className="feature-card animate-on-scroll delay-5">
                 <div className="feature-icon">
                   <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <circle cx="10" cy="10" r="4" stroke="currentColor" strokeWidth="1.5"/>
-                    <circle cx="20" cy="18" r="4" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M14 10h2a4 4 0 014 4v0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    <rect x="4" y="4" width="20" height="20" rx="3" stroke="currentColor" strokeWidth="1.5"/>
+                    <path d="M10 8v12M14 12v8M18 10v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
                 </div>
-                <h3 className="feature-title">取引先管理</h3>
+                <h3 className="feature-title">エンタープライズ対応</h3>
                 <p className="feature-desc">
-                  取引先の会社情報・振込先・インボイス登録番号を一元管理。法人番号との突合チェックも自動化。新規取引先登録も数クリックで完了。
+                  SSO/SAML認証、REST API、複数ユーザー権限管理、SLA 99.9%保証。大規模組織のセキュリティ要件と運用体制に対応します。
                 </p>
-                <span className="feature-tag">マスタ管理</span>
+                <span className="feature-tag">Enterprise</span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── INTEGRATIONS ─────────────────────────── */}
+        {/* -- INTEGRATIONS -- */}
         <section
           className="integrations"
           id="integrations"
@@ -763,7 +929,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── HOW IT WORKS ─────────────────────────── */}
+        {/* -- HOW IT WORKS -- */}
         <section
           className="how-it-works"
           id="how-it-works"
@@ -795,7 +961,7 @@ export default function Home() {
                   メールアドレスで無料登録。会社名・インボイス登録番号・銀行口座を設定します。
                 </p>
                 <div className="step-detail">
-                  約30秒 ・ クレカ不要
+                  約30秒 / 7日間無料トライアル
                 </div>
               </div>
 
@@ -816,7 +982,7 @@ export default function Home() {
                   取引先をインポートまたは手動追加。請求書テンプレートにロゴ・カラーを設定します。
                 </p>
                 <div className="step-detail">
-                  約5分 ・ CSVインポート対応
+                  約5分 / CSVインポート対応
                 </div>
               </div>
 
@@ -836,14 +1002,14 @@ export default function Home() {
                   取引先を選び明細を入力。AIが補完し、ワンクリックで送付完了。入金は自動管理。
                 </p>
                 <div className="step-detail">
-                  最短30秒 ・ AI補完付き
+                  最短30秒 / AI補完付き
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── COMPANY SIZE ─────────────────────────── */}
+        {/* -- COMPANY SIZE -- */}
         <section
           className="company-size"
           id="company-size"
@@ -867,7 +1033,7 @@ export default function Home() {
                 <ul className="size-card-points">
                   <li>
                     <span className="check-icon blue"><CheckIcon /></span>
-                    無料プランで十分な発行枚数
+                    7日間無料トライアルですぐ開始
                   </li>
                   <li>
                     <span className="check-icon blue"><CheckIcon /></span>
@@ -879,7 +1045,7 @@ export default function Home() {
                   </li>
                 </ul>
                 <div className="size-card-rec">
-                  <strong>おすすめ:</strong> Freeプラン
+                  <strong>おすすめ:</strong> Free Trialから始める
                 </div>
               </div>
 
@@ -932,13 +1098,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── PRICING ──────────────────────────────── */}
+        {/* -- PRICING (3-column) -- */}
         <section className="pricing" id="pricing" ref={sectionRefs.pricing}>
           <div className="container">
             <div className="pricing-header animate-on-scroll">
               <span className="section-label">料金プラン</span>
               <h2 className="section-title">
-                月5通まで無料。シンプルな料金体系。
+                7日間の無料トライアル付き。シンプルな料金体系。
               </h2>
               <p className="section-desc">
                 まずは無料で試してください。本格導入はPro ¥980/月から。
@@ -946,21 +1112,21 @@ export default function Home() {
             </div>
 
             <div className="pricing-grid">
-              {/* Free */}
+              {/* Free Trial */}
               <div className="pricing-card animate-on-scroll">
-                <div className="pricing-plan-name">Free</div>
+                <div className="pricing-plan-name">Free Trial</div>
                 <div className="pricing-price">
                   <span className="pricing-currency">&yen;</span>
                   <span className="pricing-amount">0</span>
                 </div>
-                <div className="pricing-period">永年無料</div>
+                <div className="pricing-period">7日間無料</div>
                 <div className="pricing-desc">
-                  まずは試したい方に。月5通まで全機能が無料。
+                  まずは試したい方に。全機能を7日間無料で体験。
                 </div>
                 <ul className="pricing-features">
                   <li>
                     <span className="pricing-check"><CheckIcon /></span>
-                    月5通まで発行
+                    全機能アクセス（7日間）
                   </li>
                   <li>
                     <span className="pricing-check"><CheckIcon /></span>
@@ -979,8 +1145,8 @@ export default function Home() {
                     取引先10社まで
                   </li>
                 </ul>
-                <a href="./signup?plan=free" className="btn btn-primary pricing-cta">
-                  無料で始める
+                <a href="./signup?plan=trial" className="btn btn-primary pricing-cta">
+                  7日間無料で試す
                 </a>
               </div>
 
@@ -1027,7 +1193,7 @@ export default function Home() {
                   </li>
                 </ul>
                 <a href="./signup?plan=pro" className="btn btn-primary pricing-cta">
-                  無料で試してみる
+                  7日間無料で試す
                 </a>
               </div>
 
@@ -1049,6 +1215,10 @@ export default function Home() {
                   <li>
                     <span className="pricing-check"><CheckIcon /></span>
                     Proの全機能
+                  </li>
+                  <li>
+                    <span className="pricing-check"><CheckIcon /></span>
+                    SSO / SAML認証
                   </li>
                   <li>
                     <span className="pricing-check"><CheckIcon /></span>
@@ -1078,12 +1248,12 @@ export default function Home() {
             </div>
 
             <p className="pricing-note">
-              年額プランなら2ヶ月分お得。すべてのプランに14日間の返金保証付き。
+              年額プランなら2ヶ月分お得。すべてのプランに7日間の無料トライアル付き。いつでも解約可能。
             </p>
           </div>
         </section>
 
-        {/* ── FAQ ──────────────────────────────────── */}
+        {/* -- FAQ -- */}
         <section className="faq" id="faq" ref={sectionRefs.faq}>
           <div className="container">
             <div className="faq-header animate-on-scroll">
@@ -1117,21 +1287,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── CTA BANNER ───────────────────────────── */}
+        {/* -- CTA BANNER -- */}
         <section className="cta-banner" id="book-call" ref={sectionRefs.cta}>
           <div className="cta-banner-inner">
             <div className="cta-banner-content animate-on-scroll">
-              <div className="cta-call-badge">まずは無料で</div>
+              <div className="cta-call-badge">まず無料で試す</div>
               <h2>
-                まずは無料で始めてみませんか?
+                まず無料で試す。納得してから課金。
               </h2>
               <p>
-                300社以上が選んだAI請求書サービス。
-                月5通まで無料、クレジットカード不要で今すぐ始められます。
+                隠れたコストはありません。7日間の無料トライアル付き。いつでも解約可能です。
               </p>
               <div className="cta-banner-actions">
                 <a href="./signup" className="btn btn-xl btn-cta-call">
-                  無料で始める
+                  7日間無料で試す
                   <ArrowRight />
                 </a>
                 <a href="./book-call" className="btn btn-xl btn-cta-call-secondary">
@@ -1139,46 +1308,61 @@ export default function Home() {
                 </a>
               </div>
               <div className="cta-call-benefits">
-                <span>&#x2714; 月5通まで無料</span>
-                <span>&#x2714; クレジットカード不要</span>
-                <span>&#x2714; インボイス制度完全対応</span>
+                <span>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
+                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  7日間無料トライアル
+                </span>
+                <span>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
+                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  いつでも解約可能
+                </span>
+                <span>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
+                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  インボイス制度完全対応
+                </span>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* ── FOOTER ────────────────────────────────── */}
-      <footer style={{ borderTop: "1px solid #E5E5E5", background: "#fff", padding: "40px 24px" }}>
-        <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+      {/* -- FOOTER -- */}
+      <footer className="lp-footer">
+        <div className="lp-footer-inner">
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "32px" }}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20">
-              <path d="M10,75 C10,75 22,25 38,25 C52,25 44,65 56,65 C68,65 60,20 74,20 C90,20 100,75 100,75" stroke="#1A1A2E" strokeWidth="7" fill="none" strokeLinecap="round"/>
+              <path d="M10,75 C10,75 22,25 38,25 C52,25 44,65 56,65 C68,65 60,20 74,20 C90,20 100,75 100,75" stroke="currentColor" strokeWidth="7" fill="none" strokeLinecap="round"/>
             </svg>
-            <span style={{ fontSize: "14px", fontWeight: 300, letterSpacing: "0.15em", color: "#111" }}>RAKUDA AI</span>
+            <span style={{ fontSize: "14px", fontWeight: 300, letterSpacing: "0.15em" }}>RAKUDA AI</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px", marginBottom: "32px" }}>
             <div>
-              <h3 style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "#9CA3AF", marginBottom: "12px" }}>サポート</h3>
+              <h3 className="lp-footer-heading">サポート</h3>
               <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column" as const, gap: "8px" }}>
-                <li><a href="mailto:info@rakuda-ai.com" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>info@rakuda-ai.com</a></li>
+                <li><a href="mailto:info@rakuda-ai.com" className="lp-footer-link">info@rakuda-ai.com</a></li>
               </ul>
             </div>
             <div>
-              <h3 style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "#9CA3AF", marginBottom: "12px" }}>リンク</h3>
+              <h3 className="lp-footer-heading">リンク</h3>
               <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column" as const, gap: "8px" }}>
-                <li><a href="./terms" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>利用規約</a></li>
-                <li><a href="./privacy" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>プライバシーポリシー</a></li>
-                <li><a href="./tokushoho" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>特定商取引法</a></li>
-                <li><a href="./security" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>セキュリティ</a></li>
+                <li><a href="./terms" className="lp-footer-link">利用規約</a></li>
+                <li><a href="./privacy" className="lp-footer-link">プライバシーポリシー</a></li>
+                <li><a href="./tokushoho" className="lp-footer-link">特定商取引法</a></li>
+                <li><a href="./security" className="lp-footer-link">セキュリティ</a></li>
               </ul>
             </div>
           </div>
-          <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
+          <div className="lp-footer-copyright">
             &copy; 2026 Rakuda AI Inc. All rights reserved.
           </div>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
