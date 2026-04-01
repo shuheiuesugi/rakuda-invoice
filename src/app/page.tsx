@@ -129,15 +129,15 @@ function HeroLiveDemo() {
 
   const screenStyle: React.CSSProperties = {
     padding: "16px",
-    color: "#E2E8F0",
+    color: "#111827",
     minHeight: "220px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-start",
   };
 
-  const labelStyle: React.CSSProperties = { fontSize: "9px", color: "#64748B", marginBottom: "4px", letterSpacing: "0.05em" };
-  const inputStyle: React.CSSProperties = { background: "#1E293B", borderRadius: "6px", padding: "7px 10px", fontSize: "11px", color: "#E2E8F0", border: "1px solid #334155" };
+  const labelStyle: React.CSSProperties = { fontSize: "9px", color: "#6b7280", marginBottom: "4px", letterSpacing: "0.05em" };
+  const inputStyle: React.CSSProperties = { background: "#f9fafb", borderRadius: "6px", padding: "7px 10px", fontSize: "11px", color: "#111827", border: "1px solid #e5e7eb" };
 
   return (
     <div className="hero-visual">
@@ -151,7 +151,7 @@ function HeroLiveDemo() {
             </div>
             <div className="browser-url">invoice.rakuda-ai.com</div>
           </div>
-          <div className="hero-browser-screen" style={{ background: "#0F172A" }}>
+          <div className="hero-browser-screen" style={{ background: "#ffffff" }}>
             <div className="hero-browser-ui" style={screenStyle}>
               {/* Step 0: Form idle state */}
               {step === 0 && (
@@ -162,13 +162,13 @@ function HeroLiveDemo() {
                   </div>
                   <div style={{ marginBottom: "10px" }}>
                     <div style={labelStyle}>取引先</div>
-                    <div style={{ ...inputStyle, color: "#64748B" }}>選択してください...</div>
+                    <div style={{ ...inputStyle, color: "#9ca3af" }}>選択してください...</div>
                   </div>
                   <div style={{ marginBottom: "10px" }}>
                     <div style={labelStyle}>金額</div>
-                    <div style={{ ...inputStyle, color: "#64748B" }}>---</div>
+                    <div style={{ ...inputStyle, color: "#9ca3af" }}>---</div>
                   </div>
-                  <button style={{ marginTop: "8px", width: "100%", padding: "8px", background: "#1E293B", color: "#64748B", border: "1px solid #334155", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "default" }}>
+                  <button style={{ marginTop: "8px", width: "100%", padding: "8px", background: "#f9fafb", color: "#9ca3af", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "default" }}>
                     入力を開始してください
                   </button>
                 </div>
@@ -190,7 +190,7 @@ function HeroLiveDemo() {
                   </div>
                   <div style={{ marginBottom: "10px" }}>
                     <div style={labelStyle}>金額</div>
-                    <div style={{ ...inputStyle, borderColor: typedAmount ? "#3B82F6" : "#334155" }}>
+                    <div style={{ ...inputStyle, borderColor: typedAmount ? "#3B82F6" : "#e5e7eb" }}>
                       {typedAmount || "---"}
                     </div>
                   </div>
@@ -205,7 +205,7 @@ function HeroLiveDemo() {
                 <div style={{ animation: "fadeIn 0.4s ease", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "200px" }}>
                   <div className="demo-spinner" />
                   <span style={{ fontSize: "12px", color: "#94A3B8", marginTop: "16px", fontWeight: 500 }}>PDF生成中...</span>
-                  <span style={{ fontSize: "10px", color: "#64748B", marginTop: "6px" }}>株式会社ABC / ¥1,200,000</span>
+                  <span style={{ fontSize: "10px", color: "#6b7280", marginTop: "6px" }}>株式会社ABC / ¥1,200,000</span>
                 </div>
               )}
 
@@ -229,7 +229,7 @@ function HeroLiveDemo() {
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: "8px" }}>
-                    <button style={{ flex: 1, padding: "7px", background: "#1E293B", color: "#E2E8F0", border: "1px solid #334155", borderRadius: "6px", fontSize: "10px", fontWeight: 600, cursor: "pointer" }}>
+                    <button style={{ flex: 1, padding: "7px", background: "#f9fafb", color: "#374151", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "10px", fontWeight: 600, cursor: "pointer" }}>
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
                         <path d="M6 2v6M3 5l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M2 9h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
@@ -255,8 +255,8 @@ function HeroLiveDemo() {
                       <path d="M6 12l4 4 8-8" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: "14px", color: "#E2E8F0", fontWeight: 600 }}>請求書作成完了</span>
-                  <span style={{ fontSize: "10px", color: "#64748B", marginTop: "6px" }}>株式会社ABC に送信しました</span>
+                  <span style={{ fontSize: "14px", color: "#111827", fontWeight: 600 }}>請求書作成完了</span>
+                  <span style={{ fontSize: "10px", color: "#6b7280", marginTop: "6px" }}>株式会社ABC に送信しました</span>
                 </div>
               )}
             </div>
@@ -272,8 +272,8 @@ function HeroLiveDemo() {
               </svg>
             </div>
             <div>
-              <div className="floating-card-text">請求書を送付しました</div>
-              <div className="floating-card-sub">株式会社ABC / 30秒</div>
+              <div className="floating-card-text" style={{ color: "#111827" }}>請求書を送付しました</div>
+              <div className="floating-card-sub" style={{ color: "#6b7280" }}>株式会社ABC / 30秒</div>
             </div>
           </div>
         </div>
@@ -287,8 +287,8 @@ function HeroLiveDemo() {
               </svg>
             </div>
             <div>
-              <div className="floating-card-text">入金確認</div>
-              <div className="floating-card-sub">¥1,320,000 / 自動消込済み</div>
+              <div className="floating-card-text" style={{ color: "#111827" }}>入金確認</div>
+              <div className="floating-card-sub" style={{ color: "#6b7280" }}>¥1,320,000 / 自動消込済み</div>
             </div>
           </div>
         </div>
@@ -328,7 +328,6 @@ const faqData = [
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   const sectionRefs = {
     hero: useScrollReveal(),
@@ -351,28 +350,12 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Load theme from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("lp-theme");
-    if (saved === "light" || saved === "dark") {
-      setTheme(saved);
-    }
-  }, []);
-
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      localStorage.setItem("lp-theme", next);
-      return next;
-    });
-  }, []);
-
   const toggleFaq = useCallback((index: number) => {
     setOpenFaq((prev) => (prev === index ? null : index));
   }, []);
 
   return (
-    <div className={theme === "light" ? "lp-light" : undefined}>
+    <div className="lp-light">
       {/* -- HEADER -- */}
       <header className={`header${scrolled ? " scrolled" : ""}`}>
         <div className="header-inner">
@@ -393,14 +376,6 @@ export default function Home() {
           </nav>
 
           <div className="header-cta-group">
-            <button
-              className="theme-toggle-btn"
-              onClick={toggleTheme}
-              aria-label={theme === "dark" ? "ライトモードに切替" : "ダークモードに切替"}
-              title={theme === "dark" ? "ライトモード" : "ダークモード"}
-            >
-              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-            </button>
             <a href="./book-call" className="btn btn-sm btn-dark">
               無料相談
             </a>
@@ -442,7 +417,7 @@ export default function Home() {
                   取引先を選んで明細を入力するだけ。AIが自動で請求書を作成し、
                   ワンクリックで送付。入金管理まで自動化します。
                   <br />
-                  <strong style={{ color: "#93C5FD" }}>7日間無料・いつでも解約可能</strong>
+                  <strong style={{ color: "#2563EB" }}>7日間無料・いつでも解約可能</strong>
                 </p>
                 <div className="hero-actions">
                   <a href="./signup" className="btn btn-lg btn-cta-call">
