@@ -85,7 +85,7 @@ export default function Signup() {
                   <h1>無料ではじめる</h1>
                   <p className="sub">
                     AIが請求書を30秒で作成。<br />
-                    Starterプランは永年無料です。
+                    7日間の無料トライアル付き。
                   </p>
 
                   <button className="signup-google" type="button">
@@ -135,7 +135,7 @@ export default function Signup() {
             </div>
 
             <div className="signup-benefits">
-              <span><span className="bcheck">&#x2714;</span> 永年無料プランあり</span>
+              <span><span className="bcheck">&#x2714;</span> 7日間無料トライアル</span>
               <span><span className="bcheck">&#x2714;</span> クレカ不要</span>
               <span><span className="bcheck">&#x2714;</span> 30秒で請求書作成</span>
             </div>
@@ -169,7 +169,7 @@ export default function Signup() {
             </div>
           </div>
           <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
-            &copy; 2026 Rakuda AI Inc. All rights reserved.
+            &copy; 2026 株式会社T Advisory All rights reserved.
           </div>
         </div>
       </footer>

@@ -26,7 +26,7 @@ export default function Terms() {
 
             <section>
               <h2>第1条（適用）</h2>
-              <p>本利用規約（以下「本規約」）は、RAKUDAインボイス運営事務局（以下「当社」）が提供するAI請求書作成サービス「RAKUDAインボイス」（以下「本サービス」）の利用に関する条件を定めるものです。ユーザーは本規約に同意の上、本サービスを利用するものとします。</p>
+              <p>本利用規約（以下「本規約」）は、株式会社T Advisory（以下「当社」）が提供するAI請求書作成サービス「RAKUDAインボイス」（以下「本サービス」）の利用に関する条件を定めるものです。ユーザーは本規約に同意の上、本サービスを利用するものとします。</p>
             </section>
 
             <section>
@@ -48,7 +48,6 @@ export default function Terms() {
               <h2>第4条（料金・支払い）</h2>
               <p>本サービスの料金は、料金ページに掲載するプランに基づきます。</p>
               <ol>
-                <li>Freeプラン: 無料（¥0）</li>
                 <li>Proプラン: 月額980円（税抜）</li>
                 <li>Enterpriseプラン: カスタム料金（お問い合わせください）</li>
               </ol>
@@ -120,7 +119,7 @@ export default function Terms() {
             </div>
           </div>
           <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
-            &copy; 2026 Rakuda AI Inc. All rights reserved.
+            &copy; 2026 株式会社T Advisory All rights reserved.
           </div>
         </div>
       </footer>

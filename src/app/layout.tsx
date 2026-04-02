@@ -11,24 +11,26 @@ export const metadata: Metadata = {
   title: "RAKUDAインボイス — AI請求書作成",
   description:
     "AIが請求書を30秒で作成。インボイス制度対応、freee・マネーフォワード連携。",
-  metadataBase: new URL("https://shuheiuesugi.github.io/rakuda-invoice"),
+  metadataBase: new URL("https://invoice.rakuda-ai.com"),
   openGraph: {
     title: "RAKUDAインボイス — AI請求書作成",
     description:
       "AIが請求書を30秒で作成。インボイス制度対応、freee・マネーフォワード連携。",
-    url: "https://shuheiuesugi.github.io/rakuda-invoice",
+    url: "https://invoice.rakuda-ai.com",
     siteName: "RAKUDAインボイス",
     locale: "ja_JP",
     type: "website",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "RAKUDAインボイス — AI請求書作成",
     description:
       "AIが請求書を30秒で作成。インボイス制度対応、freee・マネーフォワード連携。",
+    images: ["/og-image.png"],
   },
   icons: {
-    icon: "/rakuda-invoice/favicon.svg",
+    icon: "/favicon.svg",
   },
 };
 

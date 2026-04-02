@@ -28,7 +28,7 @@ export default function Tokushoho() {
               <tbody>
                 <tr>
                   <th>販売業者</th>
-                  <td>RAKUDAインボイス運営事務局</td>
+                  <td>株式会社T Advisory</td>
                 </tr>
                 <tr>
                   <th>運営統括責任者</th>
@@ -126,7 +126,7 @@ export default function Tokushoho() {
             </div>
           </div>
           <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
-            &copy; 2026 Rakuda AI Inc. All rights reserved.
+            &copy; 2026 株式会社T Advisory All rights reserved.
           </div>
         </div>
       </footer>

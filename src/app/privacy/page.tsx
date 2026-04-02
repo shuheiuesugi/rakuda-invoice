@@ -26,7 +26,7 @@ export default function Privacy() {
 
             <section>
               <h2>1. はじめに</h2>
-              <p>RAKUDAインボイス運営事務局（以下「当社」）は、本サービスをご利用いただくお客様の個人情報および請求書関連データの保護に努めています。本プライバシーポリシーでは、当社が収集する情報の種類、利用目的、管理方法についてご説明します。</p>
+              <p>株式会社T Advisory（以下「当社」）は、本サービスをご利用いただくお客様の個人情報および請求書関連データの保護に努めています。本プライバシーポリシーでは、当社が収集する情報の種類、利用目的、管理方法についてご説明します。</p>
             </section>
 
             <section>
@@ -84,7 +84,7 @@ export default function Privacy() {
             <section>
               <h2>9. お問い合わせ</h2>
               <p>本ポリシーに関するお問い合わせは、以下までご連絡ください。</p>
-              <p>RAKUDAインボイス運営事務局<br />メール: info@rakuda-ai.com</p>
+              <p>株式会社T Advisory<br />メール: info@rakuda-ai.com</p>
             </section>
 
             <div className="legal-back">
@@ -120,7 +120,7 @@ export default function Privacy() {
             </div>
           </div>
           <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
-            &copy; 2026 Rakuda AI Inc. All rights reserved.
+            &copy; 2026 株式会社T Advisory All rights reserved.
           </div>
         </div>
       </footer>

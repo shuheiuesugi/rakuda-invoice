@@ -1104,52 +1104,14 @@ export default function Home() {
             <div className="pricing-header animate-on-scroll">
               <span className="section-label">料金プラン</span>
               <h2 className="section-title">
-                7日間の無料トライアル付き。シンプルな料金体系。
+                シンプルで透明な料金体系
               </h2>
               <p className="section-desc">
-                まずは無料で試してください。本格導入はPro ¥980/月から。
+                Pro ¥980/月から。7日間の無料トライアル付き。
               </p>
             </div>
 
-            <div className="pricing-grid">
-              {/* Free Trial */}
-              <div className="pricing-card animate-on-scroll">
-                <div className="pricing-plan-name">Free Trial</div>
-                <div className="pricing-price">
-                  <span className="pricing-currency">&yen;</span>
-                  <span className="pricing-amount">0</span>
-                </div>
-                <div className="pricing-period">7日間無料</div>
-                <div className="pricing-desc">
-                  まずは試したい方に。全機能を7日間無料で体験。
-                </div>
-                <ul className="pricing-features">
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    全機能アクセス（7日間）
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    インボイス制度対応
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    AI自動補完
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    PDF生成・メール送付
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    取引先10社まで
-                  </li>
-                </ul>
-                <a href="./signup?plan=trial" className="btn btn-primary pricing-cta">
-                  7日間無料で試す
-                </a>
-              </div>
-
+            <div className="pricing-grid pricing-grid--2col">
               {/* Pro */}
               <div className="pricing-card popular animate-on-scroll delay-1">
                 <div className="pricing-popular-badge">一番人気</div>
@@ -1160,7 +1122,7 @@ export default function Home() {
                 </div>
                 <div className="pricing-period">/月（税抜）</div>
                 <div className="pricing-desc">
-                  月100通まで。会計ソフト連携・自動入金管理で業務を完全自動化。
+                  7日間の無料トライアル付き。月100通まで。会計ソフト連携・自動入金管理で業務を完全自動化。
                 </div>
                 <ul className="pricing-features">
                   <li>
@@ -1248,7 +1210,7 @@ export default function Home() {
             </div>
 
             <p className="pricing-note">
-              年額プランなら2ヶ月分お得。すべてのプランに7日間の無料トライアル付き。いつでも解約可能。
+              年額プランなら2ヶ月分お得。7日間の無料トライアル付き。いつでも解約可能。
             </p>
           </div>
         </section>
@@ -1359,7 +1321,7 @@ export default function Home() {
             </div>
           </div>
           <div className="lp-footer-copyright">
-            &copy; 2026 Rakuda AI Inc. All rights reserved.
+            &copy; 2026 株式会社T Advisory All rights reserved.
           </div>
         </div>
       </footer>

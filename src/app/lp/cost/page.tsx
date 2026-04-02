@@ -159,7 +159,7 @@ export default function CostLP() {
           </nav>
 
           <div className="header-cta-group">
-            <a href="../signup" className="btn btn-sm btn-cta-call">
+            <a href="/signup" className="btn btn-sm btn-cta-call">
               月5通まで無料で試す
             </a>
           </div>
@@ -198,7 +198,7 @@ export default function CostLP() {
                   月額¥980のProプランで請求書作成が無制限。他社サービスの1/4以下の料金で、AI機能付き。
                 </p>
                 <div className="hero-actions">
-                  <a href="../signup" className="btn btn-lg btn-cta-call">
+                  <a href="/signup" className="btn btn-lg btn-cta-call">
                     月5通まで無料で試す
                     <ArrowRight />
                   </a>
@@ -809,47 +809,9 @@ export default function CostLP() {
               </p>
             </div>
 
-            <div className="pricing-grid">
-              {/* Free */}
-              <div className="pricing-card animate-on-scroll">
-                <div className="pricing-plan-name">Free</div>
-                <div className="pricing-price">
-                  <span className="pricing-currency">&yen;</span>
-                  <span className="pricing-amount">0</span>
-                </div>
-                <div className="pricing-period">永年無料</div>
-                <div className="pricing-desc">
-                  まずは試してみたい方に。月5通まで全機能を無料で。初期費用もゼロ。
-                </div>
-                <ul className="pricing-features">
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    月5通まで請求書作成
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    AI自動作成（全機能）
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    インボイス制度対応
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    PDF送付・ダウンロード
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    取引先マスタ管理
-                  </li>
-                </ul>
-                <a href="../signup?plan=free" className="btn btn-primary pricing-cta">
-                  月5通まで無料で試す
-                </a>
-              </div>
-
+            <div className="pricing-grid pricing-grid--2col">
               {/* Pro */}
-              <div className="pricing-card popular animate-on-scroll delay-1">
+              <div className="pricing-card popular animate-on-scroll">
                 <div className="pricing-popular-badge">一番人気 ・ 他社の1/4以下</div>
                 <div className="pricing-plan-name">Pro</div>
                 <div className="pricing-price">
@@ -890,13 +852,13 @@ export default function CostLP() {
                     自社ロゴ・カラーカスタマイズ
                   </li>
                 </ul>
-                <a href="../signup?plan=pro" className="btn btn-primary pricing-cta">
+                <a href="/signup?plan=pro" className="btn btn-primary pricing-cta">
                   無料で試してみる
                 </a>
               </div>
 
               {/* Enterprise */}
-              <div className="pricing-card animate-on-scroll delay-2">
+              <div className="pricing-card animate-on-scroll delay-1">
                 <div className="pricing-plan-name">Enterprise</div>
                 <div className="pricing-price" style={{ fontSize: "14px", lineHeight: 1.4, paddingTop: "8px" }}>
                   <span style={{ fontSize: "28px", fontWeight: 700 }}>カスタム</span>
@@ -994,7 +956,7 @@ export default function CostLP() {
                 初期費用ゼロ・解約金ゼロ。まず月5通まで無料でお試しください。
               </p>
               <div className="cta-banner-actions">
-                <a href="../signup" className="btn btn-xl btn-cta-call">
+                <a href="/signup" className="btn btn-xl btn-cta-call">
                   月5通まで無料で試す
                   <ArrowRight />
                 </a>
@@ -1031,15 +993,15 @@ export default function CostLP() {
             <div>
               <h3 style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "#9CA3AF", marginBottom: "12px" }}>リンク</h3>
               <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column" as const, gap: "8px" }}>
-                <li><a href="../terms" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>利用規約</a></li>
-                <li><a href="../privacy" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>プライバシーポリシー</a></li>
-                <li><a href="../tokushoho" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>特定商取引法</a></li>
-                <li><a href="../security" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>セキュリティ</a></li>
+                <li><a href="/terms" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>利用規約</a></li>
+                <li><a href="/privacy" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>プライバシーポリシー</a></li>
+                <li><a href="/tokushoho" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>特定商取引法</a></li>
+                <li><a href="/security" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>セキュリティ</a></li>
               </ul>
             </div>
           </div>
           <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
-            &copy; 2026 Rakuda AI Inc. All rights reserved.
+            &copy; 2026 株式会社T Advisory. All rights reserved.
           </div>
         </div>
       </footer>

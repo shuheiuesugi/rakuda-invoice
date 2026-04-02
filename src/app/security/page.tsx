@@ -25,7 +25,7 @@ export default function Security() {
             <p className="legal-updated">最終更新日: 2026年3月24日</p>
 
             <p className="security-lead">
-              ラクダInvoiceは、お客様の請求書データと事業者情報を守ることを最優先に設計されています。
+              RAKUDAインボイスは、お客様の請求書データと事業者情報を守ることを最優先に設計されています。
               電子帳簿保存法に完全対応し、以下のセキュリティ対策を実施しています。
             </p>
 
@@ -128,7 +128,7 @@ export default function Security() {
             </div>
           </div>
           <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
-            &copy; 2026 Rakuda AI Inc. All rights reserved.
+            &copy; 2026 株式会社T Advisory All rights reserved.
           </div>
         </div>
       </footer>
