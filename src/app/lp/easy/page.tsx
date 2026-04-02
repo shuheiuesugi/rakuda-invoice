@@ -172,7 +172,7 @@ export default function EasyLP() {
           </nav>
 
           <div className="header-cta-group">
-            <a href="../signup" className="btn btn-sm btn-cta-call">
+            <a href="/signup" className="btn btn-sm btn-cta-call">
               30秒で無料アカウント作成
             </a>
           </div>
@@ -210,7 +210,7 @@ export default function EasyLP() {
                   取引先を選んで金額を入力するだけ。AIが住所・品目・税率を自動で補完して、インボイス対応の請求書が30秒で完成します。
                 </p>
                 <div className="hero-actions">
-                  <a href="../signup" className="btn btn-lg btn-cta-call">
+                  <a href="/signup" className="btn btn-lg btn-cta-call">
                     30秒で無料アカウント作成
                     <ArrowRight />
                   </a>
@@ -751,47 +751,9 @@ export default function EasyLP() {
               </p>
             </div>
 
-            <div className="pricing-grid">
-              {/* Free */}
-              <div className="pricing-card animate-on-scroll">
-                <div className="pricing-plan-name">おためしプラン（Free）</div>
-                <div className="pricing-price">
-                  <span className="pricing-currency">&yen;</span>
-                  <span className="pricing-amount">0</span>
-                </div>
-                <div className="pricing-period">ずっと無料</div>
-                <div className="pricing-desc">
-                  まずは試してみたい方に。月5通まで全機能が使えます。
-                </div>
-                <ul className="pricing-features">
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    月5通まで請求書を作れる
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    AIが自動で入力してくれる
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    インボイスのルールも自動対応
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    PDFで送付・ダウンロードできる
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    取引先を登録できる
-                  </li>
-                </ul>
-                <a href="../signup?plan=free" className="btn btn-primary pricing-cta">
-                  無料で始める
-                </a>
-              </div>
-
+            <div className="pricing-grid pricing-grid--2col">
               {/* Pro */}
-              <div className="pricing-card popular animate-on-scroll delay-1">
+              <div className="pricing-card popular animate-on-scroll">
                 <div className="pricing-popular-badge">いちばん人気</div>
                 <div className="pricing-plan-name">Proプラン</div>
                 <div className="pricing-price">
@@ -832,13 +794,13 @@ export default function EasyLP() {
                     自社のロゴ・色に変更できる
                   </li>
                 </ul>
-                <a href="../signup?plan=pro" className="btn btn-primary pricing-cta">
+                <a href="/signup?plan=pro" className="btn btn-primary pricing-cta">
                   30秒で無料アカウント作成
                 </a>
               </div>
 
               {/* Enterprise */}
-              <div className="pricing-card animate-on-scroll delay-2">
+              <div className="pricing-card animate-on-scroll delay-1">
                 <div className="pricing-plan-name">エンタープライズ</div>
                 <div className="pricing-price" style={{ fontSize: "14px", lineHeight: 1.4, paddingTop: "8px" }}>
                   <span style={{ fontSize: "28px", fontWeight: 700 }}>カスタム</span>
@@ -932,7 +894,7 @@ export default function EasyLP() {
                 月5通まで無料。難しい設定は何もありません。
               </p>
               <div className="cta-banner-actions">
-                <a href="../signup" className="btn btn-xl btn-cta-call">
+                <a href="/signup" className="btn btn-xl btn-cta-call">
                   30秒で無料アカウント作成
                   <ArrowRight />
                 </a>
@@ -969,15 +931,15 @@ export default function EasyLP() {
             <div>
               <h3 style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "#9CA3AF", marginBottom: "12px" }}>リンク</h3>
               <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column" as const, gap: "8px" }}>
-                <li><a href="../terms" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>利用規約</a></li>
-                <li><a href="../privacy" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>プライバシーポリシー</a></li>
-                <li><a href="../tokushoho" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>特定商取引法</a></li>
-                <li><a href="../security" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>セキュリティ</a></li>
+                <li><a href="/terms" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>利用規約</a></li>
+                <li><a href="/privacy" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>プライバシーポリシー</a></li>
+                <li><a href="/tokushoho" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>特定商取引法</a></li>
+                <li><a href="/security" style={{ fontSize: "14px", color: "#6B7280", textDecoration: "none" }}>セキュリティ</a></li>
               </ul>
             </div>
           </div>
           <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
-            &copy; 2026 Rakuda AI Inc. All rights reserved.
+            &copy; 2026 株式会社T Advisory. All rights reserved.
           </div>
         </div>
       </footer>
