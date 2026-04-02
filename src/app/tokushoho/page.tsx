@@ -31,12 +31,12 @@ export default function Tokushoho() {
                   <td>株式会社T Advisory</td>
                 </tr>
                 <tr>
-                  <th>運営統括責任者</th>
-                  <td>代表者名（請求に応じて遅滞なく開示いたします）</td>
+                  <th>代表者</th>
+                  <td>代表取締役 本田貴大</td>
                 </tr>
                 <tr>
                   <th>所在地</th>
-                  <td>東京都港区（請求に応じて遅滞なく開示いたします）</td>
+                  <td>〒107-0052 東京都港区赤坂1-8-1 赤坂インターシティAIR 9F</td>
                 </tr>
                 <tr>
                   <th>電話番号</th>
@@ -126,7 +126,7 @@ export default function Tokushoho() {
             </div>
           </div>
           <div style={{ borderTop: "1px solid #E5E5E5", paddingTop: "24px", textAlign: "center" as const, fontSize: "12px", color: "#9CA3AF" }}>
-            &copy; 2026 株式会社T Advisory All rights reserved.
+            &copy; 2026 T Advisory Inc. All rights reserved.
           </div>
         </div>
       </footer>

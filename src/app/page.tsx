@@ -1436,7 +1436,7 @@ export default function RakudaInvoicePage() {
             </div>
           </div>
           <div className="footer-copyright">
-            &copy; 2026 株式会社T Advisory All rights reserved.
+            &copy; 2026 T Advisory Inc. All rights reserved.
           </div>
         </div>
       </footer>
