@@ -1,19 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 /* ============================================================
-   RAKUDAインボイス — AI請求書自動化 LP (v2 overhaul)
+   Rakuda Invoice Landing Page — V10 Overhaul
+   invoice.rakuda-ai.com
    ============================================================ */
 
-// Intersection Observer hook with varied animation directions
-function useScrollReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-
+// ─── Scroll animation hook ─────────────────────────────────
+function useScrollAnimation() {
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -22,394 +18,609 @@ function useScrollReveal() {
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+      { threshold: 0.08, rootMargin: "0px 0px -60px 0px" }
     );
 
-    const children = el.querySelectorAll(".animate-on-scroll");
-    children.forEach((child) => observer.observe(child));
+    const elements = document.querySelectorAll(
+      ".fade-up, .fade-in, .slide-left, .slide-right, .scale-in, .stagger-item"
+    );
+    elements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
   }, []);
-
-  return ref;
 }
 
-// SVG Icons
-const CheckIcon = () => (
-  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-    <path
-      d="M2 5.5L4 7.5L8 3"
+// ─── Scroll progress hook ───────────────────────────────────
+function useScrollProgress() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollTop = window.scrollY;
+          const docHeight =
+            document.documentElement.scrollHeight - window.innerHeight;
+          setProgress(docHeight > 0 ? (scrollTop / docHeight) * 100 : 0);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return progress;
+}
+
+// ─── Counter animation hook ─────────────────────────────────
+function useCountUp(
+  target: number,
+  duration: number = 2000,
+  startOnView: boolean = true
+) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!startOnView) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started) {
+          setStarted(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [started, startOnView]);
+
+  useEffect(() => {
+    if (!started) return;
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const p = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setCount(Math.round(eased * target));
+      if (p < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [started, target, duration]);
+
+  return { count, ref };
+}
+
+
+// ─── SVG Icons ──────────────────────────────────────────────
+function ChevronDown({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 20 20"
+      fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
-  </svg>
-);
+    >
+      <path d="M5 7.5L10 12.5L15 7.5" />
+    </svg>
+  );
+}
 
-const ChevronDown = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-    <path
-      d="M3.5 5.25L7 8.75L10.5 5.25"
+function ArrowRight({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
-  </svg>
-);
+    >
+      <path d="M3 8H13M9 4L13 8L9 12" />
+    </svg>
+  );
+}
 
-const ArrowRight = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <path
-      d="M3 8H13M13 8L9 4M13 8L9 12"
+function CheckIcon() {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 10 10"
+      fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-    />
-  </svg>
-);
+    >
+      <path d="M2 5.5L4 7.5L8 3" />
+    </svg>
+  );
+}
 
-const SunIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="5" />
-    <line x1="12" y1="1" x2="12" y2="3" />
-    <line x1="12" y1="21" x2="12" y2="23" />
-    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-    <line x1="1" y1="12" x2="3" y2="12" />
-    <line x1="21" y1="12" x2="23" y2="12" />
-    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-  </svg>
-);
+function DocumentIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
+    </svg>
+  );
+}
 
-const MoonIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-  </svg>
-);
+function ShieldCheckIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  );
+}
 
-// Hero Live Demo Component
-function HeroLiveDemo() {
+function GridIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
+    </svg>
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function ChartIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10" />
+      <line x1="12" y1="20" x2="12" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+  );
+}
+
+function BuildingIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+      <line x1="9" y1="6" x2="9" y2="6.01" />
+      <line x1="15" y1="6" x2="15" y2="6.01" />
+      <line x1="9" y1="10" x2="9" y2="10.01" />
+      <line x1="15" y1="10" x2="15" y2="10.01" />
+      <line x1="9" y1="14" x2="9" y2="14.01" />
+      <line x1="15" y1="14" x2="15" y2="14.01" />
+      <path d="M9 18h6" />
+    </svg>
+  );
+}
+
+function ShieldIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+function CheckCircleIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22 6 12 13 2 6" />
+    </svg>
+  );
+}
+
+// ─── Live Demo Component ────────────────────────────────────
+function LiveDemoAnimation() {
   const [step, setStep] = useState(0);
   const [typedClient, setTypedClient] = useState("");
   const [typedAmount, setTypedAmount] = useState("");
+  const [aiFields, setAiFields] = useState(0);
+  const [invoiceLines, setInvoiceLines] = useState(0);
+  const [invoiceFaded, setInvoiceFaded] = useState(false);
 
   const clientName = "株式会社ABC";
   const amountText = "¥1,200,000";
 
+  const invoiceContent = [
+    { type: "header", text: "請求書" },
+    { type: "blank", text: "" },
+    { type: "meta", text: "請求書番号: INV-2026-0042" },
+    { type: "meta", text: "発行日: 2026年4月1日" },
+    { type: "meta", text: "T1234567890123" },
+    { type: "blank", text: "" },
+    { type: "section", text: "■ 株式会社ABC 御中" },
+    { type: "blank", text: "" },
+    { type: "row", text: "  コンサルティング業務  ¥1,200,000" },
+    { type: "row", text: "  消費税 (10%)          ¥120,000" },
+    { type: "blank", text: "" },
+    { type: "total", text: "  合計（税込）          ¥1,320,000" },
+    { type: "blank", text: "" },
+    { type: "detail", text: "  振込先: 三菱UFJ銀行 渋谷支店" },
+    { type: "detail", text: "  口座番号: 普通 1234567" },
+    { type: "detail", text: "  支払期限: 2026年4月30日" },
+  ];
+
+  // Step timings
   useEffect(() => {
-    const timings = [2500, 2500, 2500, 2500, 2000];
+    const timings = [2500, 3000, 3000, 5000, 2000];
     const timer = setTimeout(() => {
       setStep((s) => (s + 1) % 5);
       setTypedClient("");
       setTypedAmount("");
+      setAiFields(0);
+      setInvoiceLines(0);
+      setInvoiceFaded(false);
     }, timings[step]);
     return () => clearTimeout(timer);
   }, [step]);
 
-  // Typewriter effect for step 1
+  // Typewriter effect for step 0 (form input)
   useEffect(() => {
-    if (step !== 1) return;
+    if (step !== 0) return;
     let i = 0;
-    const clientInterval = setInterval(() => {
+    const interval = setInterval(() => {
       i++;
       if (i <= clientName.length) {
         setTypedClient(clientName.slice(0, i));
       } else if (i - clientName.length <= amountText.length) {
         setTypedAmount(amountText.slice(0, i - clientName.length));
       } else {
-        clearInterval(clientInterval);
+        clearInterval(interval);
       }
     }, 80);
-    return () => clearInterval(clientInterval);
+    return () => clearInterval(interval);
   }, [step]);
 
-  const screenStyle: React.CSSProperties = {
-    padding: "16px",
-    color: "#E2E8F0",
-    minHeight: "220px",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-  };
+  // AI auto-complete animation for step 1
+  useEffect(() => {
+    if (step !== 1) return;
+    const t1 = setTimeout(() => setAiFields(1), 600);
+    const t2 = setTimeout(() => setAiFields(2), 1200);
+    const t3 = setTimeout(() => setAiFields(3), 1800);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [step]);
 
-  const labelStyle: React.CSSProperties = { fontSize: "9px", color: "#64748B", marginBottom: "4px", letterSpacing: "0.05em" };
-  const inputStyle: React.CSSProperties = { background: "#1E293B", borderRadius: "6px", padding: "7px 10px", fontSize: "11px", color: "#E2E8F0", border: "1px solid #334155" };
+  // Invoice typewriter for step 2
+  useEffect(() => {
+    if (step !== 2) return;
+    const typewriterCount = 7;
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setInvoiceLines(i);
+      if (i >= typewriterCount) {
+        clearInterval(interval);
+        setTimeout(() => setInvoiceFaded(true), 300);
+      }
+    }, 280);
+    return () => clearInterval(interval);
+  }, [step]);
 
   return (
-    <div className="hero-visual">
-      <div className="hero-browser-frame">
-        <div className="hero-browser-outer">
-          <div className="hero-browser-bar">
-            <div className="browser-dots">
-              <span className="dot red" />
-              <span className="dot yellow" />
-              <span className="dot green" />
+    <div className="live-demo-browser">
+      {/* Browser chrome */}
+      <div className="live-demo-chrome">
+        <div className="live-demo-dots">
+          <span className="live-demo-dot live-demo-dot--red" />
+          <span className="live-demo-dot live-demo-dot--yellow" />
+          <span className="live-demo-dot live-demo-dot--green" />
+        </div>
+        <div className="live-demo-url-bar">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.4, flexShrink: 0 }}>
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0110 0v4" />
+          </svg>
+          <span>invoice.rakuda-ai.com</span>
+        </div>
+      </div>
+
+      {/* Demo content */}
+      <div className="live-demo-content">
+        {/* Step 0: Form input — typing client + amount */}
+        {step === 0 && (
+          <div className="live-demo-step live-demo-step--visible">
+            <div className="live-demo-search-screen">
+              <div className="live-demo-logo-text">RAKUDAインボイス</div>
+              <div className="live-demo-form-group">
+                <div className="live-demo-form-label">取引先</div>
+                <div className="live-demo-search-box live-demo-search-box--active">
+                  <DocumentIcon />
+                  <span className="live-demo-typed">{typedClient}<span className="live-demo-cursor" /></span>
+                </div>
+              </div>
+              <div className="live-demo-form-group">
+                <div className="live-demo-form-label">金額</div>
+                <div className="live-demo-search-box" style={{ opacity: typedAmount ? 1 : 0.5 }}>
+                  <span className="live-demo-typed">{typedAmount || "---"}</span>
+                </div>
+              </div>
+              <div className="live-demo-form-group">
+                <div className="live-demo-form-label">品目</div>
+                <div className="live-demo-search-box" style={{ opacity: 0.5 }}>
+                  <span>コンサルティング業務</span>
+                </div>
+              </div>
             </div>
-            <div className="browser-url">invoice.rakuda-ai.com</div>
           </div>
-          <div className="hero-browser-screen" style={{ background: "#0F172A" }}>
-            <div className="hero-browser-ui" style={screenStyle}>
-              {/* Step 0: Form idle state */}
-              {step === 0 && (
-                <div style={{ animation: "fadeIn 0.4s ease" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
-                    <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", color: "#94A3B8" }}>請求書を作成</span>
-                    <span style={{ fontSize: "10px", background: "#10B981", color: "#fff", padding: "2px 8px", borderRadius: "10px", fontWeight: 600 }}>AI補完 ON</span>
+        )}
+
+        {/* Step 1: AI auto-complete */}
+        {step === 1 && (
+          <div className="live-demo-step live-demo-step--visible">
+            <div className="live-demo-research-screen">
+              <div className="live-demo-research-title">AI自動補完中...</div>
+              <div className="live-demo-spinner" />
+              <div className="live-demo-sources">
+                <div className={`live-demo-source-item ${aiFields >= 0 ? "live-demo-source-item--active" : ""} ${aiFields >= 1 ? "live-demo-source-item--done" : ""}`}>
+                  <ShieldCheckIcon />
+                  <span>インボイス番号を検証中...</span>
+                  <span className="live-demo-source-count">{aiFields >= 1 ? "T1234..." : "--"}</span>
+                </div>
+                {aiFields >= 1 && (
+                  <div className={`live-demo-source-item ${aiFields >= 1 ? "live-demo-source-item--active" : ""} ${aiFields >= 2 ? "live-demo-source-item--done" : ""}`} style={{ animation: "liveDemoFadeIn 0.3s ease forwards" }}>
+                    <ChartIcon />
+                    <span>{aiFields >= 2 ? "税率計算完了" : "消費税を自動計算中..."}</span>
+                    <span className="live-demo-source-count">{aiFields >= 2 ? <CheckIcon /> : ""}</span>
                   </div>
-                  <div style={{ marginBottom: "10px" }}>
-                    <div style={labelStyle}>取引先</div>
-                    <div style={{ ...inputStyle, color: "#64748B" }}>選択してください...</div>
+                )}
+                {aiFields >= 2 && (
+                  <div className={`live-demo-source-item ${aiFields >= 2 ? "live-demo-source-item--active" : ""} ${aiFields >= 3 ? "live-demo-source-item--done" : ""}`} style={{ animation: "liveDemoFadeIn 0.3s ease forwards" }}>
+                    <DocumentIcon />
+                    <span>{aiFields >= 3 ? "振込先・支払条件セット完了" : "振込先情報を自動設定中..."}</span>
+                    <span className="live-demo-source-count">{aiFields >= 3 ? <CheckIcon /> : ""}</span>
                   </div>
-                  <div style={{ marginBottom: "10px" }}>
-                    <div style={labelStyle}>金額</div>
-                    <div style={{ ...inputStyle, color: "#64748B" }}>---</div>
+                )}
+              </div>
+              <div className="live-demo-progress-bar">
+                <div className="live-demo-progress-fill" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Invoice PDF preview — typewriter + fade */}
+        {step === 2 && (
+          <div className="live-demo-step live-demo-step--visible">
+            <div className="live-demo-report-typewriter">
+              {invoiceContent.map((line, i) => {
+                const typewriterCount = 7;
+                const isVisible = i < typewriterCount ? i < invoiceLines : invoiceFaded;
+                const isFaded = i >= typewriterCount;
+                return (
+                  <div
+                    key={i}
+                    className={`live-demo-rpt-line live-demo-rpt-line--${line.type} ${isVisible ? "live-demo-rpt-line--visible" : ""} ${isFaded ? "live-demo-rpt-line--fade" : ""}`}
+                  >
+                    {line.text}
                   </div>
-                  <button style={{ marginTop: "8px", width: "100%", padding: "8px", background: "#1E293B", color: "#64748B", border: "1px solid #334155", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "default" }}>
-                    入力を開始してください
+                );
+              })}
+              {invoiceFaded && (
+                <button className="live-demo-pdf-btn" style={{ marginTop: "6px", animation: "liveDemoFadeIn 0.4s ease forwards" }}>
+                  <DownloadIcon />
+                  PDF出力
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Email sending */}
+        {step === 3 && (
+          <div className="live-demo-step live-demo-step--visible">
+            <div className="live-demo-research-screen">
+              <div className="live-demo-research-title">メール送付</div>
+              <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px", width: "100%", maxWidth: "280px" }}>
+                <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: "8px", padding: "10px 12px", fontSize: "11px" }}>
+                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "9px", marginBottom: "4px" }}>宛先</div>
+                  <div style={{ color: "rgba(255,255,255,0.9)" }}>accounting@abc-corp.co.jp</div>
+                </div>
+                <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: "8px", padding: "10px 12px", fontSize: "11px" }}>
+                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "9px", marginBottom: "4px" }}>件名</div>
+                  <div style={{ color: "rgba(255,255,255,0.9)" }}>【請求書】2026年4月分 / INV-2026-0042</div>
+                </div>
+                <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: "8px", padding: "10px 12px", fontSize: "11px" }}>
+                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "9px", marginBottom: "4px" }}>添付</div>
+                  <div style={{ color: "rgba(255,255,255,0.9)", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <DownloadIcon /> INV-2026-0042.pdf (148KB)
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
+                  <button className="live-demo-pdf-btn" style={{ flex: 1, animation: "liveDemoFadeIn 0.4s ease forwards" }}>
+                    <MailIcon /> ワンクリック送信
                   </button>
                 </div>
-              )}
-
-              {/* Step 1: Typing client + amount */}
-              {step === 1 && (
-                <div style={{ animation: "fadeIn 0.4s ease" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
-                    <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", color: "#94A3B8" }}>請求書を作成</span>
-                    <span style={{ fontSize: "10px", background: "#10B981", color: "#fff", padding: "2px 8px", borderRadius: "10px", fontWeight: 600 }}>AI補完 ON</span>
-                  </div>
-                  <div style={{ marginBottom: "10px" }}>
-                    <div style={labelStyle}>取引先</div>
-                    <div style={{ ...inputStyle, borderColor: "#3B82F6" }}>
-                      {typedClient}
-                      <span style={{ borderRight: "2px solid #3B82F6", animation: "blink 0.8s infinite", marginLeft: "1px" }}>&nbsp;</span>
-                    </div>
-                  </div>
-                  <div style={{ marginBottom: "10px" }}>
-                    <div style={labelStyle}>金額</div>
-                    <div style={{ ...inputStyle, borderColor: typedAmount ? "#3B82F6" : "#334155" }}>
-                      {typedAmount || "---"}
-                    </div>
-                  </div>
-                  <button style={{ marginTop: "8px", width: "100%", padding: "8px", background: "linear-gradient(135deg, #3B82F6, #2563EB)", color: "#fff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>
-                    PDF生成
-                  </button>
-                </div>
-              )}
-
-              {/* Step 2: Generating PDF spinner */}
-              {step === 2 && (
-                <div style={{ animation: "fadeIn 0.4s ease", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "200px" }}>
-                  <div className="demo-spinner" />
-                  <span style={{ fontSize: "12px", color: "#94A3B8", marginTop: "16px", fontWeight: 500 }}>PDF生成中...</span>
-                  <span style={{ fontSize: "10px", color: "#64748B", marginTop: "6px" }}>株式会社ABC / ¥1,200,000</span>
-                </div>
-              )}
-
-              {/* Step 3: PDF preview + action buttons */}
-              {step === 3 && (
-                <div style={{ animation: "fadeIn 0.4s ease" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-                    <span style={{ fontSize: "11px", fontWeight: 600, color: "#94A3B8" }}>PDFプレビュー</span>
-                    <span style={{ fontSize: "10px", background: "#3B82F6", color: "#fff", padding: "2px 8px", borderRadius: "10px", fontWeight: 600 }}>完了</span>
-                  </div>
-                  <div style={{ background: "#fff", borderRadius: "6px", padding: "12px", marginBottom: "12px" }}>
-                    <div style={{ fontSize: "8px", color: "#9CA3AF", marginBottom: "4px" }}>請求書 No. INV-2026-0401</div>
-                    <div style={{ fontSize: "11px", color: "#111", fontWeight: 600, marginBottom: "2px" }}>株式会社ABC 御中</div>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "9px", color: "#6B7280", borderTop: "1px solid #E5E7EB", paddingTop: "6px", marginTop: "6px" }}>
-                      <span>コンサルティング業務</span>
-                      <span style={{ fontWeight: 600, color: "#111" }}>¥1,200,000</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#111", fontWeight: 700, borderTop: "1px solid #E5E7EB", paddingTop: "6px", marginTop: "6px" }}>
-                      <span>合計（税込）</span>
-                      <span>¥1,320,000</span>
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <button style={{ flex: 1, padding: "7px", background: "#1E293B", color: "#E2E8F0", border: "1px solid #334155", borderRadius: "6px", fontSize: "10px", fontWeight: 600, cursor: "pointer" }}>
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
-                        <path d="M6 2v6M3 5l3 3 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M2 9h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                      </svg>
-                      ダウンロード
-                    </button>
-                    <button style={{ flex: 1, padding: "7px", background: "linear-gradient(135deg, #3B82F6, #2563EB)", color: "#fff", border: "none", borderRadius: "6px", fontSize: "10px", fontWeight: 600, cursor: "pointer" }}>
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
-                        <path d="M2 3h8v7H2z" stroke="currentColor" strokeWidth="1.2" />
-                        <path d="M2 4l4 3 4-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                      </svg>
-                      メール送信
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 4: Completed check */}
-              {step === 4 && (
-                <div style={{ animation: "fadeIn 0.4s ease", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "200px" }}>
-                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(16, 185, 129, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M6 12l4 4 8-8" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <span style={{ fontSize: "14px", color: "#E2E8F0", fontWeight: 600 }}>請求書作成完了</span>
-                  <span style={{ fontSize: "10px", color: "#64748B", marginTop: "6px" }}>株式会社ABC に送信しました</span>
-                </div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="hero-floating-card card-1">
-          <div className="floating-card-inner">
-            <div className="floating-card-icon check">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <circle cx="9" cy="9" r="7" stroke="#10B981" strokeWidth="1.5" />
-                <path d="M6 9l2 2 4-4" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <div>
-              <div className="floating-card-text">請求書を送付しました</div>
-              <div className="floating-card-sub">株式会社ABC / 30秒</div>
+        {/* Step 4: Complete */}
+        {step === 4 && (
+          <div className="live-demo-step live-demo-step--visible">
+            <div className="live-demo-complete-screen">
+              <div className="live-demo-complete-icon">
+                <CheckCircleIcon />
+              </div>
+              <div className="live-demo-complete-text">請求書送付完了</div>
+              <div className="live-demo-complete-sub">株式会社ABC / 30秒 / ステータス追跡開始</div>
             </div>
           </div>
-        </div>
-
-        <div className="hero-floating-card card-2">
-          <div className="floating-card-inner">
-            <div className="floating-card-icon slack">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <circle cx="9" cy="9" r="7" stroke="#3B82F6" strokeWidth="1.5" />
-                <path d="M9 6v3l2 2" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <div>
-              <div className="floating-card-text">入金確認</div>
-              <div className="floating-card-sub">¥1,320,000 / 自動消込済み</div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
 }
 
-// FAQ
-const faqData = [
-  {
-    q: "無料トライアル後の料金はどうなりますか?",
-    a: "7日間の無料トライアル後、自動的にProプラン（月額¥980）に移行します。トライアル中にいつでもキャンセル可能で、その場合は一切課金されません。",
-  },
-  {
-    q: "インボイス制度の登録番号はどうやって設定しますか?",
-    a: "初回の事業者情報設定で「T+13桁」の登録番号を入力するだけです。以降、すべての請求書に自動記載されます。税率ごとの消費税額や端数処理もインボイス制度のルールに沿って自動計算します。",
-  },
-  {
-    q: "freeeやマネーフォワードと連携できますか?",
-    a: "はい。freee・マネーフォワードクラウド・弥生会計にワンクリックで連携可能です。CSV一括エクスポートにも対応しているので、お使いの会計ソフトに合わせた運用ができます。",
-  },
-  {
-    q: "途中でプランを変更できますか?",
-    a: "いつでも変更できます。アップグレードは即時反映（日割り計算）、ダウングレードは次回請求サイクルから適用されます。",
-  },
-  {
-    q: "データのセキュリティは大丈夫ですか?",
-    a: "AES-256暗号化、AWS東京リージョン保管、TLS 1.3通信保護に加え、SOC 2 Type II認証を取得しています。電子帳簿保存法の保存要件にも対応済みです。",
-  },
-  {
-    q: "解約はいつでもできますか?",
-    a: "はい、いつでも管理画面から解約できます。契約期間終了日までサービスをご利用いただけます。年額プランの途中解約による返金にも対応しています。",
-  },
-];
+// ============================================================
+// MAIN PAGE COMPONENT
+// ============================================================
 
-export default function Home() {
-  const [scrolled, setScrolled] = useState(false);
+export default function RakudaInvoicePage() {
+  useScrollAnimation();
+  const scrollProgress = useScrollProgress();
+  const [headerScrolled, setHeaderScrolled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const sectionRefs = {
-    hero: useScrollReveal(),
-    pain: useScrollReveal(),
-    stats: useScrollReveal(),
-    flow: useScrollReveal(),
-    features: useScrollReveal(),
-    integrations: useScrollReveal(),
-    howItWorks: useScrollReveal(),
-    companySize: useScrollReveal(),
-    pricing: useScrollReveal(),
-    socialProof: useScrollReveal(),
-    faq: useScrollReveal(),
-    cta: useScrollReveal(),
-  };
+  // Counter animations for hero stats
+  const stat1 = useCountUp(30, 2200);
+  const stat2 = useCountUp(992, 2600);
+  const stat3 = useCountUp(49, 1800);
+
+  // Timer animation for Before/After
+  const [timerBefore, setTimerBefore] = useState(0);
+  const [timerAfter, setTimerAfter] = useState(0);
+  const timerRef = useRef<HTMLDivElement>(null);
+  const [timerStarted, setTimerStarted] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40);
+    const handleScroll = () => {
+      setHeaderScrolled(window.scrollY > 20);
+    };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Load theme from localStorage
+  // Timer animation observer
   useEffect(() => {
-    const saved = localStorage.getItem("lp-theme");
-    if (saved === "light" || saved === "dark") {
-      setTheme(saved);
-    }
-  }, []);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !timerStarted) {
+          setTimerStarted(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (timerRef.current) observer.observe(timerRef.current);
+    return () => observer.disconnect();
+  }, [timerStarted]);
 
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      localStorage.setItem("lp-theme", next);
-      return next;
-    });
-  }, []);
+  useEffect(() => {
+    if (!timerStarted) return;
+    const duration = 3000;
+    const beforeTarget = 28; // 28 min per invoice manually
+    const afterTarget = 1; // ~30 seconds with RAKUDA (shown as "30秒")
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const p = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setTimerBefore(Math.round(eased * beforeTarget));
+      setTimerAfter(Math.round(eased * afterTarget));
+      if (p < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [timerStarted]);
 
   const toggleFaq = useCallback((index: number) => {
     setOpenFaq((prev) => (prev === index ? null : index));
   }, []);
 
+  const formatTime = (minutes: number) => {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (h > 0) return `${h}時間${m > 0 ? `${m}分` : ""}`;
+    if (m === 0) return "30秒";
+    return `${m}分`;
+  };
+
   return (
-    <div className={theme === "light" ? "lp-light" : undefined}>
-      {/* -- HEADER -- */}
-      <header className={`header${scrolled ? " scrolled" : ""}`}>
+    <>
+      {/* ── Scroll Progress ── */}
+      <div
+        className="scroll-progress"
+        style={{ width: `${scrollProgress}%` }}
+      />
+
+      {/* ══════════════════════════════════════════════════════
+          1. STICKY HEADER
+          ══════════════════════════════════════════════════════ */}
+      <header
+        className={`site-header ${headerScrolled ? "site-header--scrolled" : ""}`}
+      >
         <div className="header-inner">
-          <a href="#" className="header-logo" style={{ display: "flex", alignItems: "center", gap: "0" }}>
-            <svg viewBox="0 0 380 40" style={{ height: "20px", width: "auto" }} className="header-logo-svg">
-              <path d="M4,32 C4,32 12,6 24,6 C34,6 28,28 36,28 C44,28 38,4 48,4 C60,4 68,32 68,32"
-                    stroke="currentColor" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-              <text x="80" y="28" fontFamily="'Helvetica Neue',Arial,sans-serif"
-                    fontSize="22" fontWeight="300" fill="currentColor" letterSpacing="3">RAKUDAインボイス</text>
+          <a href="./" className="header-logo" style={{ display: "flex", alignItems: "center", gap: "0" }}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 40" style={{ height: 20, width: "auto" }}>
+              <path d="M4,32 C4,32 12,6 24,6 C34,6 28,28 36,28 C44,28 38,4 48,4 C60,4 68,32 68,32" stroke="currentColor" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+              <text x="80" y="28" fontFamily="'Helvetica Neue',Arial,sans-serif" fontSize="22" fontWeight="300" fill="currentColor" letterSpacing="3">RAKUDAインボイス</text>
             </svg>
           </a>
 
           <nav className="header-nav">
-            <a href="#features">機能</a>
-            <a href="#integrations">連携</a>
-            <a href="#pricing">料金</a>
-            <a href="#faq">FAQ</a>
+            <a href="#features" className="header-nav-link">
+              機能
+            </a>
+            <a href="#how-it-works" className="header-nav-link">
+              使い方
+            </a>
+            <a href="#pricing" className="header-nav-link">
+              料金
+            </a>
+            <a href="#faq" className="header-nav-link">
+              FAQ
+            </a>
           </nav>
 
           <div className="header-cta-group">
-            <button
-              className="theme-toggle-btn"
-              onClick={toggleTheme}
-              aria-label={theme === "dark" ? "ライトモードに切替" : "ダークモードに切替"}
-              title={theme === "dark" ? "ライトモード" : "ダークモード"}
-            >
-              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-            </button>
-            <a href="./book-call" className="btn btn-sm btn-dark">
+            <a href="./book-call" className="header-btn header-btn-dark">
               無料相談
             </a>
-            <a href="./signup" className="btn btn-sm btn-cta-call">
+            <a href="./signup" className="header-btn header-btn-cta">
               7日間無料で試す
             </a>
           </div>
 
-          <button className="mobile-menu-btn" aria-label="メニューを開く">
+          <button className={`mobile-menu-btn${mobileMenuOpen ? " active" : ""}`} aria-label="メニューを開く" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             <span />
             <span />
             <span />
@@ -417,828 +628,745 @@ export default function Home() {
         </div>
       </header>
 
-      <main>
-        {/* -- HERO -- */}
-        <section className="hero" ref={sectionRefs.hero}>
-          <div className="hero-grid-pattern" />
-          <div className="container">
-            <div className="hero-content">
-              <div className="hero-text">
-                <div className="hero-badge">
-                  <span className="hero-badge-dot" />
-                  インボイス制度完全対応
-                </div>
-                <h1>
-                  AIが請求書を、
-                  <br />
-                  <span className="accent-text">30秒で。</span>
-                </h1>
-                <p className="hero-pain">
-                  手作業で<em>時間がかかる</em>。インボイス制度の対応が<em>不安</em>。
-                  <br />
-                  回収管理が煩雑で、未払いを見落としていませんか?
-                </p>
-                <p className="hero-subtitle">
-                  取引先を選んで明細を入力するだけ。AIが自動で請求書を作成し、
-                  ワンクリックで送付。入金管理まで自動化します。
-                  <br />
-                  <strong style={{ color: "#93C5FD" }}>7日間無料・いつでも解約可能</strong>
-                </p>
-                <div className="hero-actions">
-                  <a href="./signup" className="btn btn-lg btn-cta-call">
-                    7日間無料で試す
-                    <ArrowRight />
-                  </a>
-                  <a href="./book-call" className="btn btn-lg btn-dark">
-                    無料相談を予約する
-                  </a>
-                </div>
-                <div className="hero-note">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                  >
-                    <path
-                      d="M7 1C3.686 1 1 3.686 1 7s2.686 6 6 6 6-2.686 6-6S10.314 1 7 1z"
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                    />
-                    <path
-                      d="M5 7l1.5 1.5L9 5.5"
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  いつでも解約可能
-                </div>
-              </div>
+      {/* Mobile Navigation */}
+      {mobileMenuOpen && (
+        <div className="mobile-nav-overlay" onClick={() => setMobileMenuOpen(false)}>
+          <nav className="mobile-nav" onClick={(e) => e.stopPropagation()}>
+            <a href="#features" onClick={() => setMobileMenuOpen(false)}>機能</a>
+            <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>使い方</a>
+            <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>料金</a>
+            <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
+            <a href="./book-call" className="mobile-nav-cta-secondary" onClick={() => setMobileMenuOpen(false)}>無料相談</a>
+            <a href="./signup" className="mobile-nav-cta" onClick={() => setMobileMenuOpen(false)}>7日間無料で試す <span>→</span></a>
+          </nav>
+        </div>
+      )}
 
-              {/* Browser Mockup -- Live Demo Animation */}
-              <HeroLiveDemo />
+      {/* ══════════════════════════════════════════════════════
+          2. HERO
+          ══════════════════════════════════════════════════════ */}
+      <section className="hero">
+        <div className="hero-noise" />
+        <div className="hero-grid-pattern" />
+        <div className="hero-glow hero-glow--1" />
+        <div className="hero-glow hero-glow--2" />
+
+        <div className="hero-inner">
+          <div className="hero-text">
+            <div className="hero-badge fade-up">
+              <span className="hero-badge-dot" />
+              インボイス制度完全対応
             </div>
+
+            <h1 className="hero-title fade-up fade-up-delay-1">
+              AIが請求書を、
+              <br />
+              <span className="hero-title-accent">30秒で。</span>
+            </h1>
+
+            <p className="hero-subtitle fade-up fade-up-delay-2">
+              取引先と品目を入力するだけ。AIが税率計算・インボイス番号付与・PDF生成を自動実行。
+              ワンクリックで送付、入金管理まで完全自動化。
+              <br />
+              <span className="hero-trial-note">7日間無料・いつでも解約可能</span>
+            </p>
+
+            <div className="hero-actions fade-up fade-up-delay-3">
+              <a href="./signup" className="btn-primary-hero">
+                7日間無料で試す
+                <ArrowRight />
+              </a>
+            </div>
+
           </div>
-        </section>
 
-        {/* -- SOCIAL PROOF (STATS BAR) -- */}
-        <section className="social-proof" ref={sectionRefs.socialProof}>
-          <div className="container">
-            <div className="social-proof-inner">
-              <div className="social-proof-label">
-                導入企業300社以上。作成時間90%削減、回収率99.2%。
-              </div>
-              <div className="social-proof-highlights">
-                <span className="social-proof-stat">
-                  <strong>300社以上</strong>
-                  <span>導入企業数</span>
-                </span>
-                <span className="social-proof-stat">
-                  <strong>月間10,000通</strong>
-                  <span>処理請求書数</span>
-                </span>
-                <span className="social-proof-stat">
-                  <strong>作成時間90%削減</strong>
-                  <span>導入企業平均</span>
-                </span>
-                <span className="social-proof-stat">
-                  <strong>回収率99.2%</strong>
-                  <span>自動リマインド効果</span>
-                </span>
-              </div>
-            </div>
+          {/* Right: Live Demo Animation */}
+          <div className="hero-visual fade-in">
+            <LiveDemoAnimation />
           </div>
-        </section>
+        </div>
 
-        {/* -- PAIN POINT -- */}
-        <section className="pain-section" ref={sectionRefs.pain}>
-          <div className="container">
-            <div className="pain-grid">
-              <div className="pain-card animate-on-scroll">
-                <span className="pain-emoji">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <rect x="4" y="6" width="20" height="16" rx="2" stroke="#6B7280" strokeWidth="1.5"/>
-                    <path d="M9 11h10M9 15h6" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M4 10h20" stroke="#6B7280" strokeWidth="1.5"/>
-                  </svg>
-                </span>
-                <div className="pain-title">手作業で時間がかかる</div>
-                <div className="pain-desc">
-                  毎月同じ取引先に同じ内容を手入力。Excel管理でヒューマンエラーが発生。
-                  請求書1通作るのに30分かかっていませんか?
-                </div>
-                <span className="pain-stat">平均作成時間 28分/通</span>
-              </div>
-
-              <div className="pain-card animate-on-scroll delay-1">
-                <span className="pain-emoji">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <path d="M14 4L4 10v8l10 6 10-6v-8L14 4z" stroke="#6B7280" strokeWidth="1.5" strokeLinejoin="round"/>
-                    <path d="M14 14v6M14 14l-6-3.5" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                </span>
-                <div className="pain-title">インボイス制度の対応が不安</div>
-                <div className="pain-desc">
-                  適格請求書の要件、税率ごとの消費税額の記載、端数処理のルール。
-                  制度対応を誤ると取引先に迷惑がかかります。
-                </div>
-                <span className="pain-stat">制度違反リスクをゼロに</span>
-              </div>
-
-              <div className="pain-card animate-on-scroll delay-2">
-                <span className="pain-emoji">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <circle cx="14" cy="14" r="9" stroke="#6B7280" strokeWidth="1.5"/>
-                    <path d="M14 9v5l3 3" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </span>
-                <div className="pain-title">回収管理が煩雑</div>
-                <div className="pain-desc">
-                  入金確認をExcelで手動管理。未払いを見落として督促が遅れる。
-                  複数取引先の入金状況を把握できていますか?
-                </div>
-                <span className="pain-stat">未払い見落としをゼロに</span>
-              </div>
-            </div>
-
-            <div className="pain-bottom-cta animate-on-scroll delay-3">
-              <p>これらすべてを、AIが自動で解決します。</p>
-              <div className="pain-bottom-sub">
-                導入企業の90%が、請求書作成にかかる時間を9割以上削減しています。
-              </div>
-            </div>
+        {/* Hero stats */}
+        <div className="hero-stats-bar fade-up fade-up-delay-4">
+          <div className="hero-stat" ref={stat1.ref}>
+            <div className="hero-stat-value">{stat1.count}秒</div>
+            <div className="hero-stat-label">請求書作成時間</div>
           </div>
-        </section>
-
-        {/* -- STATS BAR -- */}
-        <section className="stats-bar" ref={sectionRefs.stats}>
-          <div className="stats-bar-inner">
-            <div className="stat-item animate-on-scroll">
-              <div className="stat-number">
-                30<span className="stat-unit">秒</span>
-              </div>
-              <div className="stat-label">請求書作成時間</div>
-            </div>
-            <div className="stat-item animate-on-scroll delay-1">
-              <div className="stat-number">
-                毎日57<span className="stat-unit">分</span>
-              </div>
-              <div className="stat-label">削減時間（平均）</div>
-            </div>
-            <div className="stat-item animate-on-scroll delay-2">
-              <div className="stat-number">
-                99.9<span className="stat-unit">%</span>
-              </div>
-              <div className="stat-label">稼働率（直近12ヶ月）</div>
-            </div>
-            <div className="stat-item animate-on-scroll delay-3">
-              <div className="stat-number">
-                SOC<span className="stat-unit">2</span>
-              </div>
-              <div className="stat-label">セキュリティ認証取得</div>
-            </div>
+          <div className="hero-stat-divider" />
+          <div className="hero-stat" ref={stat2.ref}>
+            <div className="hero-stat-value">{(stat2.count / 10).toFixed(1)}%</div>
+            <div className="hero-stat-label">インボイス制度適合率</div>
           </div>
-        </section>
-
-        {/* -- FLOW（4ステップ） -- */}
-        <section className="qr-flow" ref={sectionRefs.flow}>
-          <div className="container">
-            <div className="qr-flow-header">
-              <div className="animate-on-scroll">
-                <span className="section-label">請求書作成の流れ</span>
-                <h2 className="section-title">
-                  4ステップで請求から回収まで完結
-                </h2>
-                <p className="section-desc">
-                  取引先を選んで明細を入力。あとはAIがすべてやってくれます。
-                </p>
-              </div>
-            </div>
-
-            <div className="flow-timeline">
-              <div className="flow-step animate-on-scroll">
-                <div className="flow-step-number">
-                  <span className="flow-step-icon">
-                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                      <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5"/>
-                      <path d="M8 11a3 3 0 106 0 3 3 0 00-6 0z" stroke="currentColor" strokeWidth="1.5"/>
-                    </svg>
-                  </span>
-                </div>
-                <span className="flow-step-label">Step 01</span>
-                <div className="flow-step-title">取引先を選択</div>
-                <div className="flow-step-desc">
-                  登録済みの取引先から選ぶだけ。インボイス番号・振込先は自動セット。
-                </div>
-                <span className="flow-step-time">10秒で完了</span>
-              </div>
-
-              <div className="flow-step animate-on-scroll delay-1">
-                <div className="flow-step-number">
-                  <span className="flow-step-icon">
-                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                      <rect x="4" y="5" width="14" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
-                      <path d="M7 9h8M7 12h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
-                  </span>
-                </div>
-                <span className="flow-step-label">Step 02</span>
-                <div className="flow-step-title">明細入力（AI補完）</div>
-                <div className="flow-step-desc">
-                  品目名を入力するとAIが単価・数量を補完提案。前回との差分も自動反映。
-                </div>
-                <span className="flow-step-time">AI補完で最速</span>
-              </div>
-
-              <div className="flow-step animate-on-scroll delay-2">
-                <div className="flow-step-number">
-                  <span className="flow-step-icon">
-                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                      <path d="M4 11h14M14 7l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                </div>
-                <span className="flow-step-label">Step 03</span>
-                <div className="flow-step-title">ワンクリック送付</div>
-                <div className="flow-step-desc">
-                  PDF生成・メール送付・Slack通知をワンクリックで実行。送付記録も自動保存。
-                </div>
-                <span className="flow-step-time">リアルタイム送付</span>
-              </div>
-
-              <div className="flow-step animate-on-scroll delay-3">
-                <div className="flow-step-number">
-                  <span className="flow-step-icon">
-                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                      <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5"/>
-                      <path d="M11 8v3l2.5 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                </div>
-                <span className="flow-step-label">Step 04</span>
-                <div className="flow-step-title">自動入金管理</div>
-                <div className="flow-step-desc">
-                  入金を自動検知・消込。期限超過で自動リマインド送信。未回収を見逃しません。
-                </div>
-                <span className="flow-step-time">回収率99.2%</span>
-              </div>
-            </div>
+          <div className="hero-stat-divider" />
+          <div className="hero-stat" ref={stat3.ref}>
+            <div className="hero-stat-value">{(stat3.count / 10).toFixed(1)}</div>
+            <div className="hero-stat-label">ユーザー満足度（5段階）</div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* -- FEATURES -- */}
-        <section className="features" id="features" ref={sectionRefs.features}>
-          <div className="container">
-            <div className="features-header animate-on-scroll">
-              <span className="section-label">主な機能</span>
-              <h2 className="section-title">
-                請求業務に必要な機能を、ひとつに。
-              </h2>
-              <p className="section-desc">
-                AI自動作成からインボイス制度対応、入金管理まで。
-                請求周りの手間をまとめて解消します。
-              </p>
-            </div>
-
-            <div className="features-grid">
-              <div className="feature-card featured animate-on-scroll">
-                <div className="feature-icon">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <rect x="4" y="4" width="20" height="20" rx="3" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M8 10h12M8 14h8M8 18h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                    <circle cx="21" cy="21" r="4" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.2"/>
-                    <path d="M19.5 21l1 1 2-2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <h3 className="feature-title">AI自動作成</h3>
-                <p className="feature-desc">
-                  取引先・品目名を選ぶとAIが過去の取引データを学習し、金額・数量・支払条件を自動補完。請求書を30秒で作成できます。定期請求は完全自動化も可能。
-                </p>
-                <span className="feature-tag">コア機能</span>
-              </div>
-
-              <div className="feature-card animate-on-scroll delay-1">
-                <div className="feature-icon">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <path d="M14 4L4 10v8l10 6 10-6v-8L14 4z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-                    <path d="M14 16v-6M11 13.5l3-3.5 3 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <h3 className="feature-title">インボイス制度対応</h3>
-                <p className="feature-desc">
-                  適格請求書の必須記載事項を自動チェック。登録番号・税率別消費税額・端数処理をすべて自動計算。制度違反のリスクをゼロにします。
-                </p>
-                <span className="feature-tag">法令対応</span>
-              </div>
-
-              <div className="feature-card animate-on-scroll delay-2">
-                <div className="feature-icon">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <rect x="5" y="7" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M5 11h18" stroke="currentColor" strokeWidth="1.5"/>
-                    <rect x="8" y="14" width="5" height="4" rx="1" stroke="currentColor" strokeWidth="1.2"/>
-                  </svg>
-                </div>
-                <h3 className="feature-title">テンプレート管理</h3>
-                <p className="feature-desc">
-                  自社ロゴ・カラー・フォントを設定したオリジナルテンプレートを作成。取引先別・プロジェクト別に複数テンプレートを使い分けられます。
-                </p>
-                <span className="feature-tag">ブランド対応</span>
-              </div>
-
-              <div className="feature-card animate-on-scroll delay-3">
-                <div className="feature-icon">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <circle cx="14" cy="14" r="9" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M14 10v4l2.5 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="14" cy="10" r="1" fill="currentColor"/>
-                  </svg>
-                </div>
-                <h3 className="feature-title">ステータス追跡</h3>
-                <p className="feature-desc">
-                  送付済み・開封済み・入金待ち・入金済みの4ステータスをリアルタイム追跡。期日超過で自動リマインドメールを送信。未回収を見逃しません。
-                </p>
-                <span className="feature-tag">回収管理</span>
-              </div>
-
-              <div className="feature-card animate-on-scroll delay-4">
-                <div className="feature-icon">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <path d="M5 20l5-7 4 4 4-6 5 9H5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-                    <path d="M5 8h18" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2"/>
-                  </svg>
-                </div>
-                <h3 className="feature-title">レポート分析</h3>
-                <p className="feature-desc">
-                  売上推移・取引先別請求額・入金サイクルを自動集計。月次・年次レポートをPDF/CSVで出力。経理・税理士との情報共有もスムーズ。
-                </p>
-                <span className="feature-tag">分析</span>
-              </div>
-
-              <div className="feature-card animate-on-scroll delay-5">
-                <div className="feature-icon">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <rect x="4" y="4" width="20" height="20" rx="3" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M10 8v12M14 12v8M18 10v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <h3 className="feature-title">エンタープライズ対応</h3>
-                <p className="feature-desc">
-                  SSO/SAML認証、REST API、複数ユーザー権限管理、SLA 99.9%保証。大規模組織のセキュリティ要件と運用体制に対応します。
-                </p>
-                <span className="feature-tag">Enterprise</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* -- INTEGRATIONS -- */}
-        <section
-          className="integrations"
-          id="integrations"
-          ref={sectionRefs.integrations}
-        >
-          <div className="container">
-            <div className="integrations-content">
-              <div className="integrations-text animate-on-scroll slide-left">
-                <span className="section-label">連携サービス</span>
-                <h2 className="section-title">
-                  会計ソフトと、
-                  <br />
-                  そのまま繋がる。
-                </h2>
-                <p className="section-desc">
-                  freee、マネーフォワード、弥生会計、Slack、Gmail、kintone。
-                  普段使っているツールをそのまま使えます。
-                  ワークフローを変えずに、請求だけ自動化。
-                </p>
-                <ul className="integration-list">
-                  <li>
-                    <span className="integration-list-icon">
-                      <CheckIcon />
-                    </span>
-                    freee / マネーフォワードクラウドへの自動仕訳連携
-                  </li>
-                  <li>
-                    <span className="integration-list-icon">
-                      <CheckIcon />
-                    </span>
-                    弥生会計・弥生販売へのCSV連携
-                  </li>
-                  <li>
-                    <span className="integration-list-icon">
-                      <CheckIcon />
-                    </span>
-                    Slack / Gmailへの送付通知・入金アラート
-                  </li>
-                  <li>
-                    <span className="integration-list-icon">
-                      <CheckIcon />
-                    </span>
-                    kintoneとの顧客・案件データ同期
-                  </li>
-                  <li>
-                    <span className="integration-list-icon">
-                      <CheckIcon />
-                    </span>
-                    Webhook / REST APIで既存システムと接続
-                  </li>
-                </ul>
-              </div>
-
-              <div className="integrations-visual animate-on-scroll slide-right delay-1">
-                <div className="integration-hub">
-                  {/* freee */}
-                  <div className="integration-card">
-                    <div className="integration-card-icon" style={{ background: "#EBF5FB" }}>
-                      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-                        <circle cx="13" cy="13" r="10" fill="#0066FF" fillOpacity="0.12"/>
-                        <text x="5" y="18" fontFamily="Arial,sans-serif" fontSize="11" fontWeight="700" fill="#0066FF">freee</text>
-                      </svg>
-                    </div>
-                    <span className="integration-card-name">freee</span>
-                    <span className="integration-card-status">対応済み</span>
-                  </div>
-
-                  {/* マネーフォワード */}
-                  <div className="integration-card">
-                    <div className="integration-card-icon" style={{ background: "#E8F5E9" }}>
-                      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-                        <circle cx="13" cy="13" r="10" fill="#00A251" fillOpacity="0.12"/>
-                        <path d="M7 17L11 9l3 6 3-4 2 6" stroke="#00A251" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                    <span className="integration-card-name">マネーフォワード</span>
-                    <span className="integration-card-status">対応済み</span>
-                  </div>
-
-                  {/* 弥生会計 */}
-                  <div className="integration-card">
-                    <div className="integration-card-icon" style={{ background: "#FFF3E0" }}>
-                      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-                        <circle cx="13" cy="13" r="10" fill="#FF6B00" fillOpacity="0.12"/>
-                        <text x="7" y="18" fontFamily="Arial,sans-serif" fontSize="10" fontWeight="700" fill="#FF6B00">弥生</text>
-                      </svg>
-                    </div>
-                    <span className="integration-card-name">弥生会計</span>
-                    <span className="integration-card-status">対応済み</span>
-                  </div>
-
-                  {/* Slack */}
-                  <div className="integration-card">
-                    <div className="integration-card-icon slack-icon">
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-                        <path d="M6 15a2 2 0 01-2-2 2 2 0 012-2h2v2a2 2 0 01-2 2zm5-5V6a2 2 0 114 0v4h-4z" fill="#E01E5A"/>
-                        <path d="M11 6a2 2 0 012-2 2 2 0 012 2v2h-2a2 2 0 01-2-2zm5 5h4a2 2 0 110 4h-4v-4z" fill="#36C5F0"/>
-                        <path d="M20 11a2 2 0 01-2 2 2 2 0 01-2-2V9h2a2 2 0 012 2zm-5 5v4a2 2 0 11-4 0v-4h4z" fill="#2EB67D"/>
-                        <path d="M15 20a2 2 0 01-2-2 2 2 0 01-2 2H9v-2a2 2 0 012-2h4z" fill="#ECB22E"/>
-                      </svg>
-                    </div>
-                    <span className="integration-card-name">Slack</span>
-                    <span className="integration-card-status">対応済み</span>
-                  </div>
-
-                  {/* Gmail */}
-                  <div className="integration-card">
-                    <div className="integration-card-icon" style={{ background: "#FCE8E6" }}>
-                      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-                        <rect x="4" y="7" width="18" height="13" rx="1.5" stroke="#EA4335" strokeWidth="1.5"/>
-                        <path d="M4 9l9 7 9-7" stroke="#EA4335" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                    <span className="integration-card-name">Gmail</span>
-                    <span className="integration-card-status">対応済み</span>
-                  </div>
-
-                  {/* kintone */}
-                  <div className="integration-card">
-                    <div className="integration-card-icon" style={{ background: "#EDE7F6" }}>
-                      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-                        <circle cx="13" cy="13" r="10" fill="#6C2BD9" fillOpacity="0.12"/>
-                        <text x="3" y="18" fontFamily="Arial,sans-serif" fontSize="9" fontWeight="700" fill="#6C2BD9">kintone</text>
-                      </svg>
-                    </div>
-                    <span className="integration-card-name">kintone</span>
-                    <span className="integration-card-status">対応済み</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* -- HOW IT WORKS -- */}
-        <section
-          className="how-it-works"
-          id="how-it-works"
-          ref={sectionRefs.howItWorks}
-        >
-          <div className="container">
-            <div className="how-it-works-header animate-on-scroll">
-              <span className="section-label">導入の流れ</span>
-              <h2 className="section-title">3ステップ、すぐに使い始められる</h2>
-              <p className="section-desc">
-                難しい設定は一切なし。アカウント作成から最初の請求書送付まで、最短30分で完了。
-              </p>
-            </div>
-
-            <div className="steps-grid">
-              <div className="step-card animate-on-scroll">
-                <div className="step-number-wrap">
-                  <div className="step-number-bg">
-                    <span className="step-number-inner">01</span>
-                  </div>
-                  <span className="step-icon-overlay">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path d="M10 2C6.686 2 4 4.686 4 8c0 4 6 10 6 10s6-6 6-10c0-3.314-2.686-6-6-6zm0 8a2 2 0 110-4 2 2 0 010 4z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-                    </svg>
-                  </span>
-                </div>
-                <h3 className="step-title">アカウント作成（30秒）</h3>
-                <p className="step-desc">
-                  メールアドレスで無料登録。会社名・インボイス登録番号・銀行口座を設定します。
-                </p>
-                <div className="step-detail">
-                  約30秒 / 7日間無料トライアル
-                </div>
-              </div>
-
-              <div className="step-card animate-on-scroll delay-2">
-                <div className="step-number-wrap">
-                  <div className="step-number-bg">
-                    <span className="step-number-inner">02</span>
-                  </div>
-                  <span className="step-icon-overlay">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <rect x="3" y="4" width="14" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
-                      <path d="M7 8h6M7 11h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
-                  </span>
-                </div>
-                <h3 className="step-title">取引先・テンプレート設定</h3>
-                <p className="step-desc">
-                  取引先をインポートまたは手動追加。請求書テンプレートにロゴ・カラーを設定します。
-                </p>
-                <div className="step-detail">
-                  約5分 / CSVインポート対応
-                </div>
-              </div>
-
-              <div className="step-card animate-on-scroll delay-4">
-                <div className="step-number-wrap">
-                  <div className="step-number-bg">
-                    <span className="step-number-inner">03</span>
-                  </div>
-                  <span className="step-icon-overlay">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path d="M4 10h12M12 6l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                </div>
-                <h3 className="step-title">請求書を作成・送付</h3>
-                <p className="step-desc">
-                  取引先を選び明細を入力。AIが補完し、ワンクリックで送付完了。入金は自動管理。
-                </p>
-                <div className="step-detail">
-                  最短30秒 / AI補完付き
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* -- COMPANY SIZE -- */}
-        <section
-          className="company-size"
-          id="company-size"
-          ref={sectionRefs.companySize}
-        >
-          <div className="container">
-            <div className="company-size-header animate-on-scroll">
-              <span className="section-label">利用規模別の導入メリット</span>
-              <h2 className="section-title">フリーランスから成長企業まで</h2>
-              <p className="section-desc">
-                月1通のフリーランスから月1,000通の成長企業まで。
-                規模に応じたプランで最適化できます。
-              </p>
-            </div>
-
-            <div className="company-size-grid">
-              <div className="size-card animate-on-scroll">
-                <span className="size-card-badge startup">フリーランス向け</span>
-                <div className="size-card-title">個人・副業</div>
-                <div className="size-card-range">月1〜5通</div>
-                <ul className="size-card-points">
-                  <li>
-                    <span className="check-icon blue"><CheckIcon /></span>
-                    7日間無料トライアルですぐ開始
-                  </li>
-                  <li>
-                    <span className="check-icon blue"><CheckIcon /></span>
-                    インボイス制度を自動対応
-                  </li>
-                  <li>
-                    <span className="check-icon blue"><CheckIcon /></span>
-                    プロ品質の請求書でブランド向上
-                  </li>
-                </ul>
-                <div className="size-card-rec">
-                  <strong>おすすめ:</strong> Free Trialから始める
-                </div>
-              </div>
-
-              <div className="size-card animate-on-scroll delay-1">
-                <span className="size-card-badge growth">中小企業向け</span>
-                <div className="size-card-title">法人・スタートアップ</div>
-                <div className="size-card-range">月6〜100通</div>
-                <ul className="size-card-points">
-                  <li>
-                    <span className="check-icon amber"><CheckIcon /></span>
-                    freee / マネーフォワード自動連携
-                  </li>
-                  <li>
-                    <span className="check-icon amber"><CheckIcon /></span>
-                    入金自動管理・リマインド送信
-                  </li>
-                  <li>
-                    <span className="check-icon amber"><CheckIcon /></span>
-                    請求書作成工数を90%削減
-                  </li>
-                </ul>
-                <div className="size-card-rec">
-                  <strong>おすすめ:</strong> Proプラン
-                </div>
-              </div>
-
-              <div className="size-card animate-on-scroll delay-2">
-                <span className="size-card-badge enterprise">成長企業向け</span>
-                <div className="size-card-title">急成長中の企業</div>
-                <div className="size-card-range">月100通以上</div>
-                <ul className="size-card-points">
-                  <li>
-                    <span className="check-icon purple"><CheckIcon /></span>
-                    API連携で基幹システムと接続
-                  </li>
-                  <li>
-                    <span className="check-icon purple"><CheckIcon /></span>
-                    複数ユーザー・権限管理
-                  </li>
-                  <li>
-                    <span className="check-icon purple"><CheckIcon /></span>
-                    SLA 99.9%保証 + 専任サポート
-                  </li>
-                </ul>
-                <div className="size-card-rec">
-                  <strong>おすすめ:</strong> Enterpriseプラン
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* -- PRICING (3-column) -- */}
-        <section className="pricing" id="pricing" ref={sectionRefs.pricing}>
-          <div className="container">
-            <div className="pricing-header animate-on-scroll">
-              <span className="section-label">料金プラン</span>
-              <h2 className="section-title">
-                シンプルで透明な料金体系
-              </h2>
-              <p className="section-desc">
-                Pro ¥980/月から。7日間の無料トライアル付き。
-              </p>
-            </div>
-
-            <div className="pricing-grid pricing-grid--2col">
-              {/* Pro */}
-              <div className="pricing-card popular animate-on-scroll delay-1">
-                <div className="pricing-popular-badge">一番人気</div>
-                <div className="pricing-plan-name">Pro</div>
-                <div className="pricing-price">
-                  <span className="pricing-currency">&yen;</span>
-                  <span className="pricing-amount">980</span>
-                </div>
-                <div className="pricing-period">/月（税抜）</div>
-                <div className="pricing-desc">
-                  7日間の無料トライアル付き。月100通まで。会計ソフト連携・自動入金管理で業務を完全自動化。
-                </div>
-                <ul className="pricing-features">
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    月100通まで発行
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    取引先 無制限
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    freee / マネーフォワード連携
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    自動入金管理・リマインド
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    Slack / Gmail通知
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    レポート分析（月次・年次）
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    CSV / PDFエクスポート
-                  </li>
-                </ul>
-                <a href="./signup?plan=pro" className="btn btn-primary pricing-cta">
-                  7日間無料で試す
-                </a>
-              </div>
-
-              {/* Enterprise */}
-              <div className="pricing-card animate-on-scroll delay-2">
-                <div className="pricing-plan-name">Enterprise</div>
-                <div className="pricing-price-custom">
-                  カスタム
-                </div>
-                <div className="pricing-period">月額・年額 相談</div>
-                <div className="pricing-desc">
-                  大量発行・API連携・専任サポートが必要な成長企業向け。
-                </div>
-                <ul className="pricing-features">
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    発行通数 無制限
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    Proの全機能
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    SSO / SAML認証
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    REST API / Webhook
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    複数ユーザー・権限管理
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    専任カスタマーサクセス
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    SLA 99.9%保証
-                  </li>
-                  <li>
-                    <span className="pricing-check"><CheckIcon /></span>
-                    電子帳簿保存法対応
-                  </li>
-                </ul>
-                <a href="./book-call" className="btn btn-secondary pricing-cta">
-                  お問い合わせ
-                </a>
-              </div>
-            </div>
-
-            <p className="pricing-note">
-              年額プランなら2ヶ月分お得。7日間の無料トライアル付き。いつでも解約可能。
+      {/* ══════════════════════════════════════════════════════
+          3. TIME COMPRESSION
+          ══════════════════════════════════════════════════════ */}
+      <section className="section section--time-comparison" ref={timerRef}>
+        <div className="section-inner-wide">
+          <div className="fade-up">
+            <p className="section-eyebrow">The Problem</p>
+            <h2 className="section-title section-title--large">
+              請求書作成の<span className="text-strike">28分</span>を取り戻す
+            </h2>
+            <p className="section-subtitle">
+              従来の手作業では、Excel入力、インボイス要件チェック、PDF変換、メール送付に平均28分を費やしています。
             </p>
           </div>
-        </section>
 
-        {/* -- FAQ -- */}
-        <section className="faq" id="faq" ref={sectionRefs.faq}>
-          <div className="container">
-            <div className="faq-header animate-on-scroll">
-              <span className="section-label">よくある質問</span>
-              <h2 className="section-title">気になるポイントをまとめました</h2>
+          <div className="time-comparison">
+            {/* Before */}
+            <div className="time-card time-card--before fade-up fade-up-delay-1">
+              <div className="time-card-header">
+                <span className="time-card-label">従来の請求書作成</span>
+              </div>
+              <div className="time-card-timer">
+                <div className="time-card-timer-value time-card-timer-value--slow">
+                  {formatTime(timerBefore)}
+                </div>
+              </div>
+              <div className="time-card-steps">
+                <div className="time-step">
+                  <div className="time-step-bar time-step-bar--long" />
+                  <span>Excel入力・計算</span>
+                  <span className="time-step-duration">~10分</span>
+                </div>
+                <div className="time-step">
+                  <div className="time-step-bar time-step-bar--medium" />
+                  <span>インボイス要件チェック</span>
+                  <span className="time-step-duration">~5分</span>
+                </div>
+                <div className="time-step">
+                  <div className="time-step-bar time-step-bar--medium" />
+                  <span>PDF変換・体裁調整</span>
+                  <span className="time-step-duration">~8分</span>
+                </div>
+                <div className="time-step">
+                  <div className="time-step-bar time-step-bar--short" />
+                  <span>メール作成・送付</span>
+                  <span className="time-step-duration">~5分</span>
+                </div>
+              </div>
+              <div className="time-card-pain">
+                記載漏れ・計算ミス・送付忘れ、<br />
+                「インボイス番号入れ忘れた」の繰り返し
+              </div>
+            </div>
+
+            {/* Arrow animation */}
+            <div className="time-arrow fade-up fade-up-delay-2">
+              <div className="time-arrow-line" />
+              <div className="time-arrow-icon">
+                <ArrowRight size={20} />
+              </div>
+              <div className="time-arrow-text">98%短縮</div>
+            </div>
+
+            {/* After */}
+            <div className="time-card time-card--after fade-up fade-up-delay-3">
+              <div className="time-card-header">
+                <span className="time-card-label">RAKUDAインボイス</span>
+                <span className="time-card-badge">AI-Powered</span>
+              </div>
+              <div className="time-card-timer">
+                <div className="time-card-timer-value time-card-timer-value--fast">
+                  {formatTime(timerAfter)}
+                </div>
+              </div>
+              <div className="time-card-steps">
+                <div className="time-step time-step--done">
+                  <div className="time-step-bar time-step-bar--instant" />
+                  <span>取引先・品目を入力</span>
+                  <span className="time-step-duration">10秒</span>
+                </div>
+                <div className="time-step time-step--done">
+                  <div className="time-step-bar time-step-bar--instant" />
+                  <span>AI自動補完・PDF生成</span>
+                  <span className="time-step-duration">~15秒</span>
+                </div>
+                <div className="time-step time-step--done">
+                  <div className="time-step-bar time-step-bar--instant" />
+                  <span>ワンクリック送付</span>
+                  <span className="time-step-duration">~5秒</span>
+                </div>
+              </div>
+              <div className="time-card-result">
+                インボイス制度完全対応の請求書が自動完成。<br />
+                メール送付・入金追跡まで一気通貫。
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          4. FEATURE CARDS
+          ══════════════════════════════════════════════════════ */}
+      <section id="features" className="section section--features">
+        <div className="section-inner">
+          <div className="fade-up">
+            <p className="section-eyebrow">Core Features</p>
+            <h2 className="section-title">
+              請求業務の全工程を、<br className="hide-mobile" />1つのツールで完結させる
+            </h2>
+          </div>
+
+          <div className="features-grid">
+            <div className="feature-card feature-card--large fade-up fade-up-delay-1">
+              <div className="feature-card-icon feature-card-icon--blue">
+                <DocumentIcon />
+              </div>
+              <h3 className="feature-card-title">AI自動作成</h3>
+              <p className="feature-card-desc">
+                取引先情報と品目を入力するだけ。AIが税率計算・インボイス番号付与・
+                レイアウト調整を自動実行。
+                定期請求は完全自動化も可能です。
+              </p>
+              <div className="feature-card-demo">
+                <div className="demo-input">
+                  <span className="demo-input-icon"><DocumentIcon /></span>
+                  <span className="demo-input-text">「株式会社ABC / コンサルティング業務 / ¥1,200,000」</span>
+                </div>
+                <div className="demo-result-preview">
+                  <span className="demo-result-dot" />
+                  AI が請求書を自動生成中...
+                </div>
+              </div>
+            </div>
+
+            <div className="feature-card fade-up fade-up-delay-2">
+              <div className="feature-card-icon feature-card-icon--purple">
+                <ShieldCheckIcon />
+              </div>
+              <h3 className="feature-card-title">インボイス制度対応</h3>
+              <p className="feature-card-desc">
+                適格請求書の要件を100%満たすフォーマット。
+                登録番号の自動検証機能付き。
+                税率別消費税額・端数処理もすべて自動計算。
+              </p>
+              <span className="feature-card-detail">
+                国税庁データベースと自動照合 <ArrowRight />
+              </span>
+            </div>
+
+            <div className="feature-card fade-up fade-up-delay-3">
+              <div className="feature-card-icon feature-card-icon--amber">
+                <GridIcon />
+              </div>
+              <h3 className="feature-card-title">テンプレート管理</h3>
+              <p className="feature-card-desc">
+                業種別・取引先別のテンプレートを無制限作成。
+                ブランドカラー・ロゴのカスタマイズも自在。
+                プロ品質の請求書を即座に発行。
+              </p>
+              <span className="feature-card-detail">
+                ロゴ・カラー・フォント自由設定 <ArrowRight />
+              </span>
+            </div>
+
+            <div className="feature-card fade-up fade-up-delay-4">
+              <div className="feature-card-icon feature-card-icon--green">
+                <EyeIcon />
+              </div>
+              <h3 className="feature-card-title">ステータス追跡</h3>
+              <p className="feature-card-desc">
+                送付済み・閲覧済み・入金済みをリアルタイム追跡。
+                未入金アラートで回収漏れを防止。
+                期日超過で自動リマインドメールを送信。
+              </p>
+              <div className="feature-source-demo">
+                <div className="source-demo-item">
+                  <span className="source-demo-badge source-demo-badge--gov">送付済み</span>
+                </div>
+                <div className="source-demo-item">
+                  <span className="source-demo-badge source-demo-badge--academic">閲覧済み</span>
+                </div>
+                <div className="source-demo-item">
+                  <span className="source-demo-badge source-demo-badge--media">入金済み</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="feature-card fade-up fade-up-delay-5">
+              <div className="feature-card-icon feature-card-icon--blue">
+                <ChartIcon />
+              </div>
+              <h3 className="feature-card-title">レポート・分析</h3>
+              <p className="feature-card-desc">
+                月次売上・取引先別集計・消費税レポートを自動生成。
+                確定申告もスムーズに。
+                PDF / CSVでエクスポート可能。
+              </p>
+              <span className="feature-card-detail">
+                月次・年次レポート自動生成 <ArrowRight />
+              </span>
+            </div>
+
+            <div className="feature-card fade-up fade-up-delay-6">
+              <div className="feature-card-icon feature-card-icon--purple">
+                <BuildingIcon />
+              </div>
+              <h3 className="feature-card-title">エンタープライズ対応</h3>
+              <p className="feature-card-desc">
+                チーム管理・承認ワークフロー・API連携。
+                大量請求もバッチ処理で効率化。
+                SSO/SAML認証、SLA保証も標準装備。
+              </p>
+              <span className="feature-card-detail">
+                REST API / Webhook対応 <ArrowRight />
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          5. INVOICE OUTPUT SHOWCASE
+          ══════════════════════════════════════════════════════ */}
+      <section className="section section--showcase">
+        <div className="section-inner-wide">
+          <div className="showcase-header fade-up">
+            <div>
+              <p className="section-eyebrow">Sample Output</p>
+              <h2 className="section-title">
+                実際の出力を見てください
+              </h2>
+              <p className="section-subtitle">
+                AIが自動生成した請求書の一例。
+                インボイス制度の必須項目をすべて網羅し、プロ品質のPDFを即座に出力。
+              </p>
+            </div>
+          </div>
+
+          <div className="showcase-layout">
+            <div className="showcase-report slide-left">
+              <div className="showcase-report-chrome">
+                <div className="report-chrome-dots">
+                  <span /><span /><span />
+                </div>
+                <span className="report-chrome-tab">請求書プレビュー</span>
+              </div>
+
+              <div className="report-content">
+                <div className="report-title-area">
+                  <h3 className="report-main-title">
+                    請求書
+                  </h3>
+                  <div className="report-meta-row">
+                    <span className="report-meta-tag">INV-2026-0042</span>
+                    <span className="report-meta-tag">適格請求書</span>
+                    <span className="report-meta-date">2026.04.01 発行</span>
+                    <span className="report-meta-sources">
+                      <ShieldCheckIcon /> インボイス制度対応
+                    </span>
+                  </div>
+                </div>
+
+                <div className="report-section">
+                  <h4 className="report-section-heading">
+                    <span className="report-section-num">宛先</span>
+                    株式会社ABC 御中
+                  </h4>
+                  <p className="report-text">
+                    下記のとおりご請求申し上げます。
+                    登録番号: <strong>T1234567890123</strong>
+                  </p>
+                </div>
+
+                <div className="report-section">
+                  <h4 className="report-section-heading">
+                    <span className="report-section-num">明細</span>
+                    請求内容
+                  </h4>
+                  <div className="report-data-table">
+                    <div className="report-table-row report-table-header">
+                      <span>品目</span>
+                      <span>数量</span>
+                      <span>金額</span>
+                    </div>
+                    <div className="report-table-row">
+                      <span>コンサルティング業務</span>
+                      <span>1</span>
+                      <span className="report-table-highlight">¥1,200,000</span>
+                    </div>
+                    <div className="report-table-row">
+                      <span>消費税（10%）</span>
+                      <span></span>
+                      <span>¥120,000</span>
+                    </div>
+                    <div className="report-table-row">
+                      <span><strong>合計（税込）</strong></span>
+                      <span></span>
+                      <span className="report-table-highlight"><strong>¥1,320,000</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="report-sources-area">
+                  <div className="report-sources-header">
+                    振込先情報
+                  </div>
+                  <div className="report-source-item">
+                    <span className="report-source-num">1</span>
+                    <span className="report-source-type report-source-type--gov">銀行</span>
+                    <span className="report-source-url">三菱UFJ銀行 渋谷支店 普通 1234567</span>
+                  </div>
+                  <div className="report-source-item">
+                    <span className="report-source-num">2</span>
+                    <span className="report-source-type report-source-type--research">期限</span>
+                    <span className="report-source-url">支払期限: 2026年4月30日</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="showcase-annotations slide-right">
+              <div className="annotation-item annotation-item--1">
+                <div className="annotation-connector" />
+                <div className="annotation-card">
+                  <div className="annotation-icon">01</div>
+                  <h4>インボイス番号自動付与</h4>
+                  <p>適格請求書発行事業者の登録番号を自動記載。
+                  国税庁のデータベースと照合し、正確性を担保。</p>
+                </div>
+              </div>
+
+              <div className="annotation-item annotation-item--2">
+                <div className="annotation-connector" />
+                <div className="annotation-card">
+                  <div className="annotation-icon">02</div>
+                  <h4>税率別自動計算</h4>
+                  <p>軽減税率8%と標準税率10%を自動判別。
+                  税率ごとの消費税額と端数処理も正確に計算。</p>
+                </div>
+              </div>
+
+              <div className="annotation-item annotation-item--3">
+                <div className="annotation-connector" />
+                <div className="annotation-card">
+                  <div className="annotation-icon">03</div>
+                  <h4>ワンクリック送付</h4>
+                  <p>PDF生成・メール作成・送付を一括実行。
+                  送付履歴・開封確認もリアルタイムで追跡可能。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          6. HOW IT WORKS
+          ══════════════════════════════════════════════════════ */}
+      <section id="how-it-works" className="section section--how">
+        <div className="section-inner">
+          <div className="fade-up how-header">
+            <p className="section-eyebrow">How it Works</p>
+            <h2 className="section-title">
+              取引先を選んで、品目を入力。<br className="hide-mobile" />
+              あとはAIがすべてやります。
+            </h2>
+          </div>
+
+          <div className="steps-timeline">
+            <div className="steps-line" />
+
+            <div className="step-item fade-up fade-up-delay-1">
+              <div className="step-number-wrap">
+                <div className="step-number">1</div>
+              </div>
+              <div className="step-content">
+                <h3 className="step-title">取引先・品目を入力</h3>
+                <p className="step-desc">
+                  登録済みの取引先を選択し、品目名を入力するだけ。
+                  過去の取引データからAIが金額・数量・支払条件を自動補完。
+                  定期請求なら入力すら不要です。
+                </p>
+                <div className="step-input-demo">
+                  <span className="step-demo-cursor" />
+                  株式会社ABC / コンサルティング業務 / ¥1,200,000
+                </div>
+              </div>
+            </div>
+
+            <div className="step-item fade-up fade-up-delay-2">
+              <div className="step-number-wrap">
+                <div className="step-number">2</div>
+              </div>
+              <div className="step-content">
+                <h3 className="step-title">AIが自動補完・PDF生成</h3>
+                <p className="step-desc">
+                  インボイス番号・税率計算・振込先情報をAIが自動セット。
+                  適格請求書の要件を100%満たすPDFをリアルタイム生成。
+                  プレビューで確認し、必要に応じて編集も可能。
+                </p>
+                <div className="step-progress-demo">
+                  <div className="step-progress-item step-progress-item--done">
+                    <CheckIcon /> インボイス番号検証
+                  </div>
+                  <div className="step-progress-item step-progress-item--done">
+                    <CheckIcon /> 税率計算・端数処理
+                  </div>
+                  <div className="step-progress-item step-progress-item--active">
+                    PDF生成中...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="step-item fade-up fade-up-delay-3">
+              <div className="step-number-wrap">
+                <div className="step-number">3</div>
+              </div>
+              <div className="step-content">
+                <h3 className="step-title">ワンクリック送付・入金追跡</h3>
+                <p className="step-desc">
+                  メール送付・Slack通知をワンクリックで実行。
+                  送付後は閲覧・入金ステータスをリアルタイム追跡。
+                  期日超過で自動リマインドを送信し、回収漏れを防止します。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          7. INTEGRATIONS
+          ══════════════════════════════════════════════════════ */}
+      <section className="section section--usecases">
+        <div className="section-inner">
+          <div className="fade-up">
+            <p className="section-eyebrow">Integrations</p>
+            <h2 className="section-title">
+              会計ソフトと、そのまま繋がる
+            </h2>
+            <p className="section-subtitle">
+              freee、マネーフォワード、弥生会計、Slack、Gmail。
+              普段使っているツールをそのまま使えます。ワークフローを変えずに、請求だけ自動化。
+            </p>
+          </div>
+
+          <div className="usecases-grid">
+            <div className="usecase-card fade-up fade-up-delay-1">
+              <div className="usecase-header">
+                <span className="usecase-industry">会計ソフト</span>
+                <span className="usecase-metric">対応済み</span>
+              </div>
+              <h3 className="usecase-title">
+                freee
+              </h3>
+              <p className="usecase-desc">
+                請求データが自動で仕訳に反映。売掛金の計上から消込まで、
+                freeeとのシームレスな連携で経理業務を完全自動化します。
+              </p>
+              <div className="usecase-quote">
+                <p>&ldquo;請求書作成から仕訳登録まで、手作業がゼロになりました&rdquo;</p>
+                <span>-- freee連携ユーザー</span>
+              </div>
+            </div>
+
+            <div className="usecase-card fade-up fade-up-delay-2">
+              <div className="usecase-header">
+                <span className="usecase-industry">会計ソフト</span>
+                <span className="usecase-metric">対応済み</span>
+              </div>
+              <h3 className="usecase-title">
+                マネーフォワード
+              </h3>
+              <p className="usecase-desc">
+                マネーフォワードクラウドとワンクリック連携。
+                請求データの自動仕訳・売上レポートの同期で、月次決算を加速します。
+              </p>
+              <div className="usecase-quote">
+                <p>&ldquo;月末の請求業務が3日から半日に短縮されました&rdquo;</p>
+                <span>-- マネーフォワード連携ユーザー</span>
+              </div>
+            </div>
+
+            <div className="usecase-card fade-up fade-up-delay-3">
+              <div className="usecase-header">
+                <span className="usecase-industry">会計ソフト・通知</span>
+                <span className="usecase-metric">対応済み</span>
+              </div>
+              <h3 className="usecase-title">
+                弥生会計・Slack・Gmail
+              </h3>
+              <p className="usecase-desc">
+                弥生会計へのCSV連携に加え、Slackでの送付通知・入金アラート、
+                Gmailでのメール送付にも対応。既存のワークフローをそのまま活用できます。
+              </p>
+              <div className="usecase-quote">
+                <p>&ldquo;Slack通知のおかげで入金の見落としがなくなりました&rdquo;</p>
+                <span>-- Slack連携ユーザー</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          8. PRICING — 2-Column Pro / Enterprise
+          ══════════════════════════════════════════════════════ */}
+      <section id="pricing" className="section section--pricing">
+        <div className="section-inner">
+          <div className="fade-up pricing-header">
+            <p className="section-eyebrow">Pricing</p>
+            <h2 className="section-title">
+              まず無料で試す。納得してから課金。
+            </h2>
+            <p className="section-subtitle section-subtitle--center">
+              隠れたコストはありません。7日間の無料トライアル付き。いつでも解約可能です。
+            </p>
+          </div>
+
+          <div className="pricing-grid pricing-grid--2col">
+            {/* Pro */}
+            <div className="pricing-card pricing-card--featured fade-up fade-up-delay-2">
+              <div className="pricing-popular-badge">最も選ばれています</div>
+              <div className="pricing-plan-name">Pro</div>
+              <div className="pricing-plan-desc">個人事業主・中小企業向け</div>
+              <div className="pricing-price">
+                <span className="pricing-amount">&yen;980</span>
+                <span className="pricing-period">/月（税込）</span>
+              </div>
+              <div className="pricing-billing-note">
+                7日間無料トライアル付き・クレカ不要
+              </div>
+              <ul className="pricing-features">
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--accent"><CheckIcon /></span>
+                  月100件まで請求書作成
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--accent"><CheckIcon /></span>
+                  インボイス制度対応
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--accent"><CheckIcon /></span>
+                  テンプレート無制限
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--accent"><CheckIcon /></span>
+                  メール送付
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--accent"><CheckIcon /></span>
+                  基本レポート
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--accent"><CheckIcon /></span>
+                  メールサポート
+                </li>
+              </ul>
+              <a href="./signup?plan=pro" className="pricing-btn pricing-btn--primary">
+                7日間無料で試す
+              </a>
+            </div>
+
+            {/* Enterprise */}
+            <div className="pricing-card fade-up fade-up-delay-3">
+              <div className="pricing-plan-name">Enterprise</div>
+              <div className="pricing-plan-desc">チーム・法人向け</div>
+              <div className="pricing-price">
+                <span className="pricing-amount pricing-amount--contact">カスタム</span>
+              </div>
+              <div className="pricing-billing-note">
+                カスタム見積り
+              </div>
+              <ul className="pricing-features">
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--included"><CheckIcon /></span>
+                  無制限請求書作成
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--included"><CheckIcon /></span>
+                  チーム管理・承認フロー
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--included"><CheckIcon /></span>
+                  API連携
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--included"><CheckIcon /></span>
+                  カスタムテンプレート
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--included"><CheckIcon /></span>
+                  専任サポート
+                </li>
+                <li className="pricing-feature-item">
+                  <span className="pricing-check pricing-check--included"><CheckIcon /></span>
+                  SLA保証（稼働率99.9%）
+                </li>
+              </ul>
+              <a href="./book-call" className="pricing-btn pricing-btn--outline">
+                お問い合わせ
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          9. FAQ
+          ══════════════════════════════════════════════════════ */}
+      <section id="faq" className="section section--faq">
+        <div className="section-inner">
+          <div className="faq-layout">
+            <div className="faq-left fade-up">
+              <p className="section-eyebrow">FAQ</p>
+              <h2 className="section-title">よくある質問</h2>
+              <p className="section-subtitle">
+                解決しない場合は<a href="#" className="faq-contact-link">お問い合わせ</a>からどうぞ。
+                営業日24時間以内に回答します。
+              </p>
             </div>
 
             <div className="faq-list">
-              {faqData.map((item, index) => (
+              {[
+                {
+                  q: "無料トライアルはありますか？",
+                  a: "7日間の無料トライアルをご用意しています。クレジットカード不要で全機能をお試しいただけます。トライアル期間中にいつでも解約可能で、その場合は一切課金されません。",
+                },
+                {
+                  q: "インボイス番号はどう設定しますか？",
+                  a: "初回設定時に適格請求書発行事業者登録番号を入力するだけです。国税庁のデータベースと自動照合し、正確性を担保します。以降、すべての請求書に自動記載されます。",
+                },
+                {
+                  q: "会計ソフトと連携できますか？",
+                  a: "freee、マネーフォワード、弥生会計とワンクリック連携が可能です。請求データが自動で仕訳に反映されます。CSV一括エクスポートにも対応しているので、お使いの会計ソフトに合わせた運用ができます。",
+                },
+                {
+                  q: "プラン変更はできますか？",
+                  a: "いつでもアップグレード・ダウングレード可能です。日割り計算で差額を調整します。アップグレードは即時反映、ダウングレードは次回請求サイクルから適用されます。",
+                },
+                {
+                  q: "セキュリティは大丈夫ですか？",
+                  a: "AES-256暗号化、SOC2準拠のインフラで運用しています。請求書データは国内データセンターで厳重管理。TLS 1.3通信保護に加え、電子帳簿保存法の保存要件にも対応済みです。",
+                },
+                {
+                  q: "解約はすぐできますか？",
+                  a: "いつでもワンクリックで解約可能です。データは解約後30日間保持され、エクスポートも可能です。年額プランの途中解約による返金にも対応しています。",
+                },
+              ].map((item, index) => (
                 <div
                   key={index}
-                  className={`faq-item${openFaq === index ? " open" : ""}`}
-                  style={{ transitionDelay: `${index * 50}ms` }}
+                  className={`faq-item ${openFaq === index ? "faq-item--open" : ""}`}
                 >
                   <button
                     className="faq-question"
                     onClick={() => toggleFaq(index)}
                     aria-expanded={openFaq === index}
                   >
-                    {item.q}
-                    <span className="faq-chevron">
-                      <ChevronDown />
-                    </span>
+                    <span>{item.q}</span>
+                    <ChevronDown className="faq-chevron" />
                   </button>
                   <div className="faq-answer">
                     <div className="faq-answer-inner">{item.a}</div>
@@ -1247,84 +1375,71 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* -- CTA BANNER -- */}
-        <section className="cta-banner" id="book-call" ref={sectionRefs.cta}>
-          <div className="cta-banner-inner">
-            <div className="cta-banner-content animate-on-scroll">
-              <div className="cta-call-badge">まず無料で試す</div>
-              <h2>
-                まず無料で試す。納得してから課金。
-              </h2>
-              <p>
-                隠れたコストはありません。7日間の無料トライアル付き。いつでも解約可能です。
-              </p>
-              <div className="cta-banner-actions">
-                <a href="./signup" className="btn btn-xl btn-cta-call">
-                  7日間無料で試す
-                  <ArrowRight />
-                </a>
-                <a href="./book-call" className="btn btn-xl btn-cta-call-secondary">
-                  無料相談を予約する
-                </a>
-              </div>
-              <div className="cta-call-benefits">
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
-                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  7日間無料トライアル
-                </span>
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
-                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  いつでも解約可能
-                </span>
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginRight: "4px", verticalAlign: "middle" }}>
-                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  インボイス制度完全対応
-                </span>
-              </div>
-            </div>
+      {/* ══════════════════════════════════════════════════════
+          10. CTA
+          ══════════════════════════════════════════════════════ */}
+      <section id="cta" className="section cta-section">
+        <div className="cta-bg-pattern" />
+        <div className="section-inner fade-up cta-inner">
+          <h2 className="cta-title">
+            次の請求書は、30秒で完成する。
+          </h2>
+          <p className="cta-subtitle">
+            まず無料で試す。納得してから課金。<br />
+            隠れたコストはありません。7日間の無料トライアル付き。いつでも解約可能です。
+          </p>
+          <div className="cta-actions">
+            <a href="./signup" className="btn-primary-hero btn-primary-hero--large">
+              7日間無料で試す
+              <ArrowRight />
+            </a>
+            <a href="./book-call" className="btn-secondary-hero">
+              無料相談
+            </a>
           </div>
-        </section>
-      </main>
+          <div className="cta-reassurance">
+            <span><ClockIcon /> 10秒で登録完了</span>
+            <span><ShieldIcon /> いつでも解約可能</span>
+          </div>
+        </div>
+      </section>
 
-      {/* -- FOOTER -- */}
-      <footer className="lp-footer">
-        <div className="lp-footer-inner">
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "32px" }}>
+      {/* ══════════════════════════════════════════════════════
+          11. FOOTER
+          ══════════════════════════════════════════════════════ */}
+      <footer className="site-footer">
+        <div className="footer-inner">
+          <div className="footer-brand">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20">
               <path d="M10,75 C10,75 22,25 38,25 C52,25 44,65 56,65 C68,65 60,20 74,20 C90,20 100,75 100,75" stroke="currentColor" strokeWidth="7" fill="none" strokeLinecap="round"/>
             </svg>
-            <span style={{ fontSize: "14px", fontWeight: 300, letterSpacing: "0.15em" }}>RAKUDA AI</span>
+            <span>RAKUDA AI</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px", marginBottom: "32px" }}>
+          <div className="footer-links-grid">
             <div>
-              <h3 className="lp-footer-heading">サポート</h3>
-              <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column" as const, gap: "8px" }}>
-                <li><a href="mailto:info@rakuda-ai.com" className="lp-footer-link">info@rakuda-ai.com</a></li>
+              <h3 className="footer-heading">サポート</h3>
+              <ul className="footer-link-list">
+                <li><a href="mailto:info@rakuda-ai.com">info@rakuda-ai.com</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="lp-footer-heading">リンク</h3>
-              <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column" as const, gap: "8px" }}>
-                <li><a href="./terms" className="lp-footer-link">利用規約</a></li>
-                <li><a href="./privacy" className="lp-footer-link">プライバシーポリシー</a></li>
-                <li><a href="./tokushoho" className="lp-footer-link">特定商取引法</a></li>
-                <li><a href="./security" className="lp-footer-link">セキュリティ</a></li>
+              <h3 className="footer-heading">リンク</h3>
+              <ul className="footer-link-list">
+                <li><a href="./terms">利用規約</a></li>
+                <li><a href="./privacy">プライバシーポリシー</a></li>
+                <li><a href="./tokushoho">特定商取引法</a></li>
+                <li><a href="./security">セキュリティ</a></li>
               </ul>
             </div>
           </div>
-          <div className="lp-footer-copyright">
+          <div className="footer-copyright">
             &copy; 2026 株式会社T Advisory All rights reserved.
           </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 }
